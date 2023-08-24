@@ -4,7 +4,7 @@ INCLUDE = ../include/
 LIBS = ../lib/
 OBJ = $(wildcard *.o)
 CC = gcc
-CFILES = ./main.c 
+CFILES = ./main.c ./world.c ./samath.c
 OFILES = $(patsubst %.c,%.o, $(CFILES))
 
 build: $(OFILES)
@@ -16,5 +16,5 @@ build: $(OFILES)
 
 
 clean:
-	rm -force *.o
+	rm *.o
 	clear
