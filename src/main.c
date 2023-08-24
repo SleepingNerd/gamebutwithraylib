@@ -55,9 +55,9 @@ int main()
         BeginDrawing();
             ClearBackground(WHITE);
             BeginMode2D(camera);
-            DrawGrid(TILE_SIZE, 0);
             DrawRectangle(selected_tile.x, selected_tile.y, TILE_SIZE, TILE_SIZE, MOUSE_OVERLAY);
             RenderWorld(world, world_size);
+
 
             EndMode2D();
         EndDrawing();
