@@ -14,19 +14,26 @@
 
 int main()
 {
-    int screenWidth = 256;
-    int screenHeight = 144;
+    int winWidth = 512;
+    int winHeight = 288;
 
-    InitWindow(screenWidth, screenHeight, "Best game I've ever seen");
+    InitWindow(winWidth, winHeight, "Best game I've ever seen");
+    
 
+    
+
+    int screenWidth = 512;
+    int screenHeight = 288;
+
+    SetWindowMinSize(screenWidth, screenHeight);
+    RenderTexture2D screen = LoadRenderTexture(screenWidth, screenHeight);
 
     Camera2D camera = {0};
     camera.zoom = 1.0f;
-
     Texture2D sprite = LoadTexture("assets/sand.png");
     SetTargetFPS(60);
 
-    Vector2i world_size = {.x = 16, .y = 9};
+    Vector2i world_size = {.x = (screenWidth/16), .y = (screenHeight/16)};
     Vector2i tile_size = {.x = 16, .y = 16};
 
     Tile *world = calloc(world_size.x*world_size.y, sizeof(Tile));
@@ -36,8 +43,8 @@ int main()
     while(!WindowShouldClose())
     {
         
-        Vector2 mouse_pos = GetScreenToWorld2D(GetMousePosition(), camera);
-        Vector2i selected_tile = {.x= floor_to_muiltiple(mouse_pos.x, TILE_SIZE), .y=floor_to_muiltiple(mouse_pos.y, TILE_SIZE)};
+        printf("%i\n", GetMousePosition().y/winHeight*screenHeight);
+        Vector2i selected_tile = {.x= floor_to_muiltiple(GetMousePosition().x/winWidth*screenWidth, TILE_SIZE), .y=floor_to_muiltiple(GetMousePosition().y/winHeight*screenHeight, TILE_SIZE)};
         Vector2i selected_tile_index =  {.x= selected_tile.x/TILE_SIZE, .y=selected_tile.y /TILE_SIZE};
 
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
@@ -50,21 +57,41 @@ int main()
         if (IsKeyPressed(KEY_F11))
         {
             ToggleFullscreen();
+            if (IsWindowFullscreen())
+            {
+                winHeight = GetMonitorHeight(GetCurrentMonitor());
+                winWidth = GetMonitorWidth(GetCurrentMonitor());
+            }
+            else
+            {
+                winWidth = screenWidth;
+                winHeight = screenHeight;
+            }
+
         }
 
-        BeginDrawing();
+
+        BeginTextureMode(screen);
             ClearBackground(WHITE);
-            BeginMode2D(camera);
             DrawRectangle(selected_tile.x, selected_tile.y, TILE_SIZE, TILE_SIZE, MOUSE_OVERLAY);
             RenderWorld(world, world_size);
 
 
-            EndMode2D();
+
+
+        EndTextureMode();
+
+            DrawTexturePro(screen.texture, (Rectangle){.x=0, .y=0, .width=screenWidth, .height=-screenHeight}, (Rectangle){.x=0, .y=0, .width=winWidth, .height=winHeight}, (Vector2){.x = 0, .y = 0}, 0.0f, WHITE);
+
+
+        BeginDrawing();
+            
         EndDrawing();
 
 
 
     }
+    free(world);
     CloseWindow();
     return 0;
 }
