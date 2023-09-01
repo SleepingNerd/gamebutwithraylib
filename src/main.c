@@ -6,6 +6,7 @@
 #include "raymath.h"
 #include "samath.h"
 #include "world.h"
+#include "sanimation.h"
 
 #define MOUSE_OVERLAY (Color){ 211, 176, 131, 100 }   
 
@@ -38,12 +39,25 @@ int main()
 
     Tile *world = calloc(world_size.x*world_size.y, sizeof(Tile));
 
+    Animation test_anim = LoadAnimation("assets/player/player.png", 5, 1.0f);
+    AnimationManager anim_m_test = {.frame = 0, .delta = 0};
     LoadTileTextures();
 
     while(!WindowShouldClose())
     {
-        
-        printf("%i\n", GetMousePosition().y/winHeight*screenHeight);
+        anim_m_test.delta += GetFrameTime();
+        if (anim_m_test.delta >= test_anim.time_between_frames)
+        {
+            anim_m_test.delta = 0;
+            anim_m_test.frame += 1;
+            if (anim_m_test.frame == test_anim.frames)
+            {
+                anim_m_test.frame = 0;
+            }
+        }
+
+
+        printf("%i\n", anim_m_test.frame);
         Vector2i selected_tile = {.x= floor_to_muiltiple(GetMousePosition().x/winWidth*screenWidth, TILE_SIZE), .y=floor_to_muiltiple(GetMousePosition().y/winHeight*screenHeight, TILE_SIZE)};
         Vector2i selected_tile_index =  {.x= selected_tile.x/TILE_SIZE, .y=selected_tile.y /TILE_SIZE};
 
@@ -75,6 +89,7 @@ int main()
             ClearBackground(WHITE);
             DrawRectangle(selected_tile.x, selected_tile.y, TILE_SIZE, TILE_SIZE, MOUSE_OVERLAY);
             RenderWorld(world, world_size);
+            DrawTexture(LoadTextureFromImage(test_anim.frame_arr[anim_m_test.frame]), 100, 100, WHITE);
 
 
 

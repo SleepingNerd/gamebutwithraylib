@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "raylib.h": "c",
+        "world.h": "c",
+        "samath.h": "c",
+        "raymath.h": "c",
+        "stdio.h": "c",
+        "stdlib.h": "c",
+        "string.h": "c"
+    }
+}
