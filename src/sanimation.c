@@ -1,5 +1,4 @@
 #include <stdlib.h>
-
 #include "sanimation.h"
 #include "raylib.h"
 
@@ -23,16 +22,19 @@ Animation LoadAnimation(const char *path, frame_i frames, float time_between_fra
     }
     return animation;
 }
-bool UpdateAnimationManager(AnimationManager*, an
+
+// Returns 
+bool UpdateAnimationManager(AnimationManager *anim_manager, Animation *anim, float delta)
 {
-    anim_m_test.delta += GetFrameTime();
-        if (anim_m_test.delta >= test_anim.time_between_frames)
+    anim_manager->delta += delta;
+        if (anim_manager->delta >= anim->time_between_frames)
         {
-            anim_m_test.delta = 0;
-            anim_m_test.frame += 1;
-            if (anim_m_test.frame == test_anim.frames)
+            anim_manager->delta = 0;
+            anim_manager->frame += 1;
+            if (anim_manager->frame == anim->frames)
             {
-                anim_m_test.frame = 0;
+                anim_manager->frame = 0;
             }
         }
+    return true;
 }

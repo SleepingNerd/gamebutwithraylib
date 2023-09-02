@@ -7,6 +7,7 @@
 #include "samath.h"
 #include "world.h"
 #include "sanimation.h"
+#include "player.h"
 
 #define MOUSE_OVERLAY (Color){ 211, 176, 131, 100 }   
 
@@ -43,18 +44,16 @@ int main()
     AnimationManager anim_m_test = {.frame = 0, .delta = 0};
     LoadTileTextures();
 
+    Player player = {.speed=80, .rect = {0}, .state=0, .velocity={0}, .jump_force=0, .gravity=0};
+    CalculateJump(&player, 40, 1);
+    printf("%i , %i\n", player.gravity, player.jump_force);
+
     while(!WindowShouldClose())
     {
-        anim_m_test.delta += GetFrameTime();
-        if (anim_m_test.delta >= test_anim.time_between_frames)
-        {
-            anim_m_test.delta = 0;
-            anim_m_test.frame += 1;
-            if (anim_m_test.frame == test_anim.frames)
-            {
-                anim_m_test.frame = 0;
-            }
-        }
+        UpdateAnimationManager(&anim_m_test, &test_anim, GetFrameTime());
+
+        ProcessInput(&player, IsKeyDown(KEY_LEFT), IsKeyDown(KEY_RIGHT), IsKeyDown(KEY_UP));
+        MoveAndUpdate(&player, GetFrameTime());
 
 
         printf("%i\n", anim_m_test.frame);
@@ -89,7 +88,7 @@ int main()
             ClearBackground(WHITE);
             DrawRectangle(selected_tile.x, selected_tile.y, TILE_SIZE, TILE_SIZE, MOUSE_OVERLAY);
             RenderWorld(world, world_size);
-            DrawTexture(LoadTextureFromImage(test_anim.frame_arr[anim_m_test.frame]), 100, 100, WHITE);
+            DrawTexture(LoadTextureFromImage(test_anim.frame_arr[anim_m_test.frame]), player.rect.x, player.rect.y, WHITE);
 
 
 

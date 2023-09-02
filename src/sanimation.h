@@ -23,7 +23,14 @@ typedef struct AnimationManager {
     float delta;        
 } AnimationManager;
 
+//
+typedef struct AnimationStateMachine {
+    char state;
+} AnimationStateMachine;
+
 Animation LoadAnimation(const char *path, frame_i frames, float time_between_frames);
+bool UpdateAnimationManager(AnimationManager *anim_manager, Animation *anim, float delta);
+
 
 
 #endif
