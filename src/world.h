@@ -1,4 +1,6 @@
 #include <raylib.h>
+#include "samath.h"
+
 
 #ifndef WORLD_H
 #define WORLD_H
@@ -7,6 +9,9 @@
 
 #define TILE_SIZE 16
 #define TILES 1
+
+// Macro to conver x and y coordinates into the
+//#define COORD_TO_INDEX(X, Y, W_SIZE) ({typeof(x) x = x}) I don't care for now
 
 extern char* texture_names[TILES];
 extern Texture2D textures[TILES];
@@ -22,6 +27,11 @@ typedef struct Tile{
     TileType type;
     Color color;
 } Tile;
+
+typedef struct World{
+    Tile *arr;
+    Vector2i size;
+} World;
 
 
 

@@ -33,19 +33,21 @@ int main()
     Camera2D camera = {0};
     camera.zoom = 1.0f;
     Texture2D sprite = LoadTexture("assets/sand.png");
-    SetTargetFPS(60);
+    //SetTargetFPS(60);
 
-    Vector2i world_size = {.x = (screenWidth/16), .y = (screenHeight/16)};
     Vector2i tile_size = {.x = 16, .y = 16};
-
-    Tile *world = calloc(world_size.x*world_size.y, sizeof(Tile));
+    World world;
+    world.size.x = (screenWidth/16);
+    world.size.y = (screenHeight/16);
+    world.arr = calloc(world.size.x*world.size.y, sizeof(Tile));
 
     Animation test_anim = LoadAnimation("assets/player/player.png", 5, 1.0f);
     AnimationManager anim_m_test = {.frame = 0, .delta = 0};
     LoadTileTextures();
 
-    Player player = {.speed=80, .rect = {0}, .state=0, .velocity={0}, .jump_force=0, .gravity=0};
+    Player player = {.speed=80, .rect = {0}, .state=0, .velocity={0}, .jump_force=0, .gravity=0, tile_size = {0}};
     CalculateJump(&player, 40, 1);
+    CalculateTileSize(&player);
     printf("%i , %i\n", player.gravity, player.jump_force);
 
     while(!WindowShouldClose())
@@ -53,7 +55,7 @@ int main()
         UpdateAnimationManager(&anim_m_test, &test_anim, GetFrameTime());
 
         ProcessInput(&player, IsKeyDown(KEY_LEFT), IsKeyDown(KEY_RIGHT), IsKeyDown(KEY_UP));
-        MoveAndUpdate(&player, GetFrameTime());
+        MoveAndUpdate(&player, GetFrameTime(), world);
 
 
         printf("%i\n", anim_m_test.frame);
@@ -64,7 +66,7 @@ int main()
         {
             printf("%i, %i\n", selected_tile_index.x, selected_tile_index.y);
 
-            ChangeTile(world, world_size, selected_tile_index);
+            ChangeTile(world.arr, world.size, selected_tile_index);
         }
 
         if (IsKeyPressed(KEY_F11))
@@ -80,14 +82,15 @@ int main()
                 winWidth = screenWidth;
                 winHeight = screenHeight;
             }
-
         }
 
 
         BeginTextureMode(screen);
             ClearBackground(WHITE);
+            DrawFPS(10, 10);
+
             DrawRectangle(selected_tile.x, selected_tile.y, TILE_SIZE, TILE_SIZE, MOUSE_OVERLAY);
-            RenderWorld(world, world_size);
+            RenderWorld(world.arr, world.size);
             DrawTexture(LoadTextureFromImage(test_anim.frame_arr[anim_m_test.frame]), player.rect.x, player.rect.y, WHITE);
 
 
@@ -105,7 +108,7 @@ int main()
 
 
     }
-    free(world);
+    free(world.arr);
     CloseWindow();
     return 0;
 }
