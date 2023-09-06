@@ -15,7 +15,7 @@ typedef frame_index frame_i;
 typedef struct Animation {
     frame_i frames;
     float time_between_frames;
-    Image *frame_arr;
+    Texture2D *frame_arr;
 } Animation;
 
 typedef struct AnimationManager {

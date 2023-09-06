@@ -4,7 +4,6 @@
 
 
 
-
 typedef enum {
     IDLE = 0,
     RUN = 1
@@ -15,9 +14,12 @@ typedef struct Player{
     Vector2i t_size;
     Vector2 velocity;
     PlayerState state;
+
     int speed;
     int jump_force;
     int gravity;
+
+
 } Player;
 
 void CalculateJump(Player *player, int height, float peak_time);

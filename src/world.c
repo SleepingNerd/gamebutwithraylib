@@ -28,7 +28,6 @@ void LoadTileTextures()
         strcat(concatted,  file_extension);
 
         // I'm just going to assume all textures are TILE_SIZE cause I really don't care for now
-        printf("%i, %s\n", i, concatted);
         textures[i] = LoadTexture(concatted);
         free(concatted);
     }

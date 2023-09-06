@@ -7,5 +7,6 @@ typedef struct Vector2i {
 } Vector2i;
 
 int floor_to_muiltiple(long x, long m);
+int ceiling_to_muiltiple(long x, long m);
 
 #endif // SAMATH_H

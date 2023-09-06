@@ -21,9 +21,6 @@ int main()
 
     InitWindow(winWidth, winHeight, "Best game I've ever seen");
     
-
-    
-
     int screenWidth = 512;
     int screenHeight = 288;
 
@@ -45,10 +42,9 @@ int main()
     AnimationManager anim_m_test = {.frame = 0, .delta = 0};
     LoadTileTextures();
 
-    Player player = {.speed=80, .rect = {0}, .state=0, .velocity={0}, .jump_force=0, .gravity=0, tile_size = {0}};
+    Player player = {.speed=40, .rect = {.height = 16, .width = 16, .x = 0, .y=0}, .state=0, .velocity={0}, .jump_force=0, .gravity=0, .t_size = {0}};
     CalculateJump(&player, 40, 1);
     CalculateTileSize(&player);
-    printf("%i , %i\n", player.gravity, player.jump_force);
 
     while(!WindowShouldClose())
     {
@@ -58,13 +54,11 @@ int main()
         MoveAndUpdate(&player, GetFrameTime(), world);
 
 
-        printf("%i\n", anim_m_test.frame);
         Vector2i selected_tile = {.x= floor_to_muiltiple(GetMousePosition().x/winWidth*screenWidth, TILE_SIZE), .y=floor_to_muiltiple(GetMousePosition().y/winHeight*screenHeight, TILE_SIZE)};
         Vector2i selected_tile_index =  {.x= selected_tile.x/TILE_SIZE, .y=selected_tile.y /TILE_SIZE};
 
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
         {
-            printf("%i, %i\n", selected_tile_index.x, selected_tile_index.y);
 
             ChangeTile(world.arr, world.size, selected_tile_index);
         }
@@ -91,7 +85,8 @@ int main()
 
             DrawRectangle(selected_tile.x, selected_tile.y, TILE_SIZE, TILE_SIZE, MOUSE_OVERLAY);
             RenderWorld(world.arr, world.size);
-            DrawTexture(LoadTextureFromImage(test_anim.frame_arr[anim_m_test.frame]), player.rect.x, player.rect.y, WHITE);
+            DrawTexture(test_anim.frame_arr[anim_m_test.frame], player.rect.x, player.rect.y, WHITE);
+            DrawRectangleRec(player.rect, BLACK);
 
 
 

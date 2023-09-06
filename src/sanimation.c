@@ -10,15 +10,16 @@ Animation LoadAnimation(const char *path, frame_i frames, float time_between_fra
 
     if (sprite_sheet.width%frames!=0)
     {
-        printf("I don't give a shit right now");
+        printf("Frame_count doesn't match spritesheet! ");
     }
 
-    Animation animation = {.frames = frames, .time_between_frames = time_between_frames, .frame_arr=malloc(sizeof(Image)*frames)};
+    Animation animation = {.frames = frames, .time_between_frames = time_between_frames, .frame_arr=malloc(sizeof(Texture2D)*frames)};
     int frame_width = sprite_sheet.width/frames;
     for(int i = 0; i<frames; i++)
     {
         Rectangle rec = {.x = frame_width*i, .y = 0, .width=frame_width, .height = sprite_sheet.height};
-        animation.frame_arr[i] = ImageFromImage(sprite_sheet, rec);
+        animation.frame_arr[i] = LoadTextureFromImage(ImageFromImage(sprite_sheet, rec));
+
     }
     return animation;
 }
