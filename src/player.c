@@ -39,11 +39,14 @@ void MoveAndUpdate(Player *player, float delta, World world)
     int bottom = player->rect.y + player->rect.height;
 
     int bottom_tile = floor_to_muiltiple(bottom, TILE_SIZE)/TILE_SIZE;
+    int top_tile_1  =floor_to_muiltiple(player->rect.y-1, TILE_SIZE)/TILE_SIZE;
 
     int top_tile = floor_to_muiltiple(player->rect.y, TILE_SIZE)/TILE_SIZE;
     int right_tile = floor_to_muiltiple(player->rect.x+player->rect.width, TILE_SIZE)/TILE_SIZE;
 
     int left_tile = floor_to_muiltiple(player->rect.x, TILE_SIZE)/TILE_SIZE;
+    int left_tile_1 = floor_to_muiltiple(player->rect.x-1, TILE_SIZE)/TILE_SIZE;
+
 
 
 
@@ -70,10 +73,9 @@ void MoveAndUpdate(Player *player, float delta, World world)
 
         for(int i = left_tile; i<= floor_to_muiltiple(player->rect.x+player->rect.width-1, TILE_SIZE)/TILE_SIZE; i++)
         {
-            printf("%i\n ", i);
-            if (world.arr[top_tile* world.size.x + i].type == SAND)
+            if (world.arr[top_tile_1* world.size.x + i].type == SAND)
             {
-                player->rect.y = top_tile * TILE_SIZE +TILE_SIZE; 
+                player->rect.y = (top_tile_1+1) * TILE_SIZE; 
                 player->velocity.y = 0;
             }
         }
@@ -87,7 +89,7 @@ void MoveAndUpdate(Player *player, float delta, World world)
     if (player->velocity.x> 0)
     {
         for(int i = top_tile; i<= floor_to_muiltiple(bottom-1, TILE_SIZE)/TILE_SIZE; i++)
-        {
+        { 
             if (world.arr[i *world.size.x+ right_tile].type ==SAND)
             {
                 player->rect.x = (right_tile)*TILE_SIZE- player->rect.width;
@@ -101,9 +103,9 @@ void MoveAndUpdate(Player *player, float delta, World world)
     {
         for(int i = top_tile; i<= floor_to_muiltiple(bottom-1, TILE_SIZE)/TILE_SIZE; i++)
         {
-            if (world.arr[i *world.size.x+ left_tile].type ==SAND)
+            if (world.arr[i *world.size.x+ left_tile_1].type ==SAND)
             {
-                player->rect.x = (left_tile+1)*TILE_SIZE;
+                player->rect.x = (left_tile_1+1)*TILE_SIZE;
 
                 player->velocity.x = 0;
                 break;

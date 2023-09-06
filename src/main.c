@@ -30,7 +30,7 @@ int main()
     Camera2D camera = {0};
     camera.zoom = 1.0f;
     Texture2D sprite = LoadTexture("assets/sand.png");
-    //SetTargetFPS(60);
+    SetTargetFPS(60);
 
     Vector2i tile_size = {.x = 16, .y = 16};
     World world;
