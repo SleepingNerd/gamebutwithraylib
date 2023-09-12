@@ -36,15 +36,23 @@ void ProcessInput(Player *player, bool left, bool right, bool jump)
 // Applies and updates velocity and position
 void MoveAndUpdate(Player *player, float delta, World world)
 {
+    
     int bottom = player->rect.y + player->rect.height;
 
+
+
+    // Describes tile rect of rect
+    int top_tile = floor_to_muiltiple(player->rect.y, TILE_SIZE)/TILE_SIZE;
     int bottom_tile = floor_to_muiltiple(bottom, TILE_SIZE)/TILE_SIZE;
+
+    int right_tile = floor_to_muiltiple(player->rect.x+player->rect.width, TILE_SIZE)/TILE_SIZE;
+    int left_tile = floor_to_muiltiple(player->rect.x, TILE_SIZE)/TILE_SIZE;
+
+
     int top_tile_1  =floor_to_muiltiple(player->rect.y-1, TILE_SIZE)/TILE_SIZE;
 
-    int top_tile = floor_to_muiltiple(player->rect.y, TILE_SIZE)/TILE_SIZE;
-    int right_tile = floor_to_muiltiple(player->rect.x+player->rect.width, TILE_SIZE)/TILE_SIZE;
 
-    int left_tile = floor_to_muiltiple(player->rect.x, TILE_SIZE)/TILE_SIZE;
+
     int left_tile_1 = floor_to_muiltiple(player->rect.x-1, TILE_SIZE)/TILE_SIZE;
 
 
@@ -57,7 +65,7 @@ void MoveAndUpdate(Player *player, float delta, World world)
     if (player->velocity.y > 0)
     {
         
-        for(int i = left_tile; i<= floor_to_muiltiple(player->rect.x+player->rect.width-1, TILE_SIZE)/TILE_SIZE; i++)
+        for(int i = left_tile; i<= right_tile; i++)
         {
             if (world.arr[bottom_tile* world.size.x +i].type == SAND)
             {
@@ -68,15 +76,16 @@ void MoveAndUpdate(Player *player, float delta, World world)
         }
     }
 
+    // Going up
     else if (player->velocity.y < 0)
     {
 
-        for(int i = left_tile; i<= floor_to_muiltiple(player->rect.x+player->rect.width-1, TILE_SIZE)/TILE_SIZE; i++)
+        for(int i = left_tile; i<= right_tile; i++)
         {
-            if (world.arr[top_tile_1* world.size.x + i].type == SAND)
+            if (world.arr[top_tile* world.size.x + i].type == SAND)
             {
-                player->rect.y = (top_tile_1+1) * TILE_SIZE; 
-                player->velocity.y = 0;
+
+                player->rect.y = (top_tile+1) * TILE_SIZE; 
             }
         }
      
@@ -84,11 +93,13 @@ void MoveAndUpdate(Player *player, float delta, World world)
 
 
     player->rect.x += player->velocity.x*delta;
-
+    /*
     // Going right
     if (player->velocity.x> 0)
     {
-        for(int i = top_tile; i<= floor_to_muiltiple(bottom-1, TILE_SIZE)/TILE_SIZE; i++)
+        printf("%i; %i\n", top_tile, bottom_tile);
+
+        for(int i = top_tile; i<= bottom_tile; i++)
         { 
             if (world.arr[i *world.size.x+ right_tile].type ==SAND)
             {
@@ -101,7 +112,7 @@ void MoveAndUpdate(Player *player, float delta, World world)
     }
     else if (player->velocity.x< 0)
     {
-        for(int i = top_tile; i<= floor_to_muiltiple(bottom-1, TILE_SIZE)/TILE_SIZE; i++)
+        for(int i = top_tile; i<= bottom_tile; i++)
         {
             if (world.arr[i *world.size.x+ left_tile_1].type ==SAND)
             {
@@ -112,7 +123,7 @@ void MoveAndUpdate(Player *player, float delta, World world)
             }
         }
     }
-
+    */
 
     player->velocity.y += player->gravity*delta;
 }
