@@ -9,9 +9,10 @@ typedef enum {
     RUN = 1
 } PlayerState;
 
+// p
 typedef struct Player{
     Rectangle rect;
-    Vector2i t_size;
+    Vector2i p_offset; // Offset from (0, 0) pixel in the top-left corner
     Vector2 velocity;
     PlayerState state;
 
@@ -22,8 +23,8 @@ typedef struct Player{
 
 } Player;
 
+void CalculateSize(Player *player , int width, int height);
 void CalculateJump(Player *player, int height, float peak_time);
-void CalculateTileSize(Player *player); // Calculates  the "tile size" of the player (t_size)
 void ProcessInput(Player *player, bool left, bool right, bool jump);
 void MoveAndUpdate(Player *player, float delta, World world);
 

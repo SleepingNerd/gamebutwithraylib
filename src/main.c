@@ -43,11 +43,11 @@ int main()
     AnimationManager anim_m_test = {.frame = 0, .delta = 0};
     LoadTileTextures();
 
-    Player player = {.speed=40, .rect = {.height = 18, .width = 18, .x = 40, .y=200}, .state=0, .velocity={0}, .jump_force=0, .gravity=0, .t_size = {0}};
+    Player player = {.speed=40, .rect = {.height = 16, .width = 8, .x = 40, .y=200}, .state=0, .velocity={0}, .jump_force=0, .gravity=0, .p_offset={0}};
     CalculateJump(&player, 40, 1);
+    CalculateSize(&player, 18, 18);
     player.gravity = 1;
     player.jump_force =-20;
-    CalculateTileSize(&player);
 
     float delta_t;
 
@@ -100,7 +100,9 @@ int main()
             DrawRectangle(selected_tile.x, selected_tile.y, TILE_SIZE, TILE_SIZE, MOUSE_OVERLAY);
             RenderWorld(world.arr, world.size);
             DrawTexture(test_anim.frame_arr[anim_m_test.frame], player.rect.x, player.rect.y, WHITE);
-            DrawRectangleRec(player.rect, BLACK);
+
+
+            //DrawRectangle(player.rect.x, player.rect.y, player.rect.width, player.rect.height , BLACK);
             //DrawRectangle(player.rect.x,  floor_to_muiltiple(player.rect.y, TILE_SIZE),TILE_SIZE, TILE_SIZE, YELLOW );
 
 

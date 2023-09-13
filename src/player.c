@@ -16,10 +16,13 @@ void CalculateJump(Player *player, int height, float peak_time)
     player->jump_force=-height;
 }
 
-void CalculateTileSize(Player *player)
+void CalculateSize(Player *player, int width, int height)
 {
-    player->t_size.x = ceil(player->rect.width/TILE_SIZE);
-    player->t_size.y = ceil(player->rect.height/TILE_SIZE);
+    player->rect.width = width;
+    player->rect.width = height;
+
+    player->p_offset.x = width-1;
+    player->p_offset.y = height-1;
 }
 
 void ProcessInput(Player *player, bool left, bool right, bool jump)
@@ -42,23 +45,21 @@ void MoveAndUpdate(Player *player, float delta, World world)
 
 
     // Describes tile rect of rect
-    int top_tile = floor_to_muiltiple(player->rect.y, TILE_SIZE)/TILE_SIZE;
-    int bottom_tile = floor_to_muiltiple(bottom, TILE_SIZE)/TILE_SIZE;
+
 
     int right_tile = floor_to_muiltiple(player->rect.x+player->rect.width, TILE_SIZE)/TILE_SIZE;
     int left_tile = floor_to_muiltiple(player->rect.x, TILE_SIZE)/TILE_SIZE;
 
 
-    int top_tile_1  =floor_to_muiltiple(player->rect.y-1, TILE_SIZE)/TILE_SIZE;
-
-
-
-    int left_tile_1 = floor_to_muiltiple(player->rect.x-1, TILE_SIZE)/TILE_SIZE;
 
 
 
 
     player->rect.y += player->velocity.y*delta;
+
+    // top_tile includes top pixel meaning that the ofsett from there should be 1 less than the height
+    int top_tile = floor_to_muiltiple(player->rect.y, TILE_SIZE)/TILE_SIZE;
+    int bottom_tile = floor_to_muiltiple(player->rect.y + player->p_offset.y, TILE_SIZE)/TILE_SIZE;
 
     
     // Going down
@@ -69,13 +70,18 @@ void MoveAndUpdate(Player *player, float delta, World world)
         {
             if (world.arr[bottom_tile* world.size.x +i].type == SAND)
             {
-                player->rect.y = bottom_tile * TILE_SIZE- player->rect.height-1; 
+                printf("%i, %i, %f, %f\n", top_tile, bottom_tile, player->rect.y, player->rect.height+ player->rect.y);
+                printf("%i, %i, %i, %i\n", top_tile, bottom_tile, (int)player->rect.y, (int)player->rect.height+ (int)player->rect.y);
+
+
+                player->rect.y = bottom_tile * TILE_SIZE; 
                 player->velocity.y = 0;
+                break;
                 
             }
         }
     }
-
+    /**/
     // Going up
     else if (player->velocity.y < 0)
     {
@@ -86,6 +92,7 @@ void MoveAndUpdate(Player *player, float delta, World world)
 
                 player->rect.y = (top_tile+1) * TILE_SIZE; 
                 player->velocity.y = 0;
+                break;
             }
         }
      
@@ -95,10 +102,13 @@ void MoveAndUpdate(Player *player, float delta, World world)
     top_tile = floor_to_muiltiple(player->rect.y, TILE_SIZE)/TILE_SIZE;
     bottom_tile = floor_to_muiltiple(player->rect.y + player->rect.height, TILE_SIZE)/TILE_SIZE;
 
+    printf("FUCK: %i, %i, %f, %f, %i\n", top_tile, bottom_tile, player->rect.y, player->rect.height+ player->rect.y, (long)player->rect.y);
+
+
 
     player->rect.x += player->velocity.x*delta;
     
-
+  
     // Going right
     if (player->velocity.x> 0)
     {
@@ -114,6 +124,7 @@ void MoveAndUpdate(Player *player, float delta, World world)
             }
         }
     }
+
 
     /*
     else if (player->velocity.x< 0)
