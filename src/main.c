@@ -31,7 +31,7 @@ int main()
     Camera2D camera = {0};
     camera.zoom = 1.0f;
     Texture2D sprite = LoadTexture("assets/sand.png");
-    SetTargetFPS(60);
+    //SetTargetFPS(60);
 
     Vector2i tile_size = {.x = 16, .y = 16};
     World world;
@@ -43,7 +43,7 @@ int main()
     AnimationManager anim_m_test = {.frame = 0, .delta = 0};
     LoadTileTextures();
 
-    Player player = {.speed=40, .rect = {.height = 16, .width = 16, .x = 40, .y=200}, .state=0, .velocity={0}, .jump_force=0, .gravity=0, .t_size = {0}};
+    Player player = {.speed=40, .rect = {.height = 18, .width = 18, .x = 40, .y=200}, .state=0, .velocity={0}, .jump_force=0, .gravity=0, .t_size = {0}};
     CalculateJump(&player, 40, 1);
     player.gravity = 1;
     player.jump_force =-20;
@@ -101,7 +101,7 @@ int main()
             RenderWorld(world.arr, world.size);
             DrawTexture(test_anim.frame_arr[anim_m_test.frame], player.rect.x, player.rect.y, WHITE);
             DrawRectangleRec(player.rect, BLACK);
-            DrawRectangle(player.rect.x,  floor_to_muiltiple(player.rect.y, TILE_SIZE),TILE_SIZE, TILE_SIZE, YELLOW );
+            //DrawRectangle(player.rect.x,  floor_to_muiltiple(player.rect.y, TILE_SIZE),TILE_SIZE, TILE_SIZE, YELLOW );
 
 
 
