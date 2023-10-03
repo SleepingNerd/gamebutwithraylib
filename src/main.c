@@ -43,11 +43,11 @@ int main()
     AnimationManager anim_m_test = {.frame = 0, .delta = 0};
     LoadTileTextures();
 
-    Player player = {.speed=40, .rect = {.height = 16, .width = 8, .x = 40, .y=200}, .state=0, .velocity={0}, .jump_force=0, .gravity=0, .p_offset={0}};
+    Player player = {.speed=20, .rect = {.height = 16, .width = 8, .x = 40, .y=200}, .state=0, .velocity={0}, .jump_force=0, .gravity=0, .p_offset={0}};
     CalculateJump(&player, 40, 1);
-    CalculateSize(&player, 18, 18);
+    CalculateSize(&player, 16, 16);
     player.gravity = 1;
-    player.jump_force =-20;
+    player.jump_force =-10;
 
     float delta_t;
 
@@ -77,7 +77,7 @@ int main()
         
 
 
-        if (IsKeyPressed(KEY_F11))
+        if (IsKeyPressed(KEY_SPACE))
         {
             ToggleFullscreen();
             if (IsWindowFullscreen())
@@ -97,15 +97,14 @@ int main()
             ClearBackground(WHITE);
             DrawFPS(10, 10);
 
+            DrawRectangle(((int)(player.rect.x+player.p_offset.x)/TILE_SIZE)*TILE_SIZE, ((int)((player.rect.y)/TILE_SIZE))*TILE_SIZE, ((int)((player.rect.width)/TILE_SIZE))*TILE_SIZE,  (int)((player.rect.y+player.rect.height)/TILE_SIZE)*TILE_SIZE, GREEN);
+            DrawRectangle(player.rect.x, player.rect.y, player.rect.width, player.rect.height , DARKGREEN);
+            
+            
+            printf("%i, %i, %f, %f--------\n", (int)player.rect.x, (int)player.rect.y, player.rect.x, player.rect.y);
+            DrawTexture(test_anim.frame_arr[anim_m_test.frame], player.rect.x, player.rect.y, WHITE);
             DrawRectangle(selected_tile.x, selected_tile.y, TILE_SIZE, TILE_SIZE, MOUSE_OVERLAY);
             RenderWorld(world.arr, world.size);
-            DrawTexture(test_anim.frame_arr[anim_m_test.frame], player.rect.x, player.rect.y, WHITE);
-
-
-            //DrawRectangle(player.rect.x, player.rect.y, player.rect.width, player.rect.height , BLACK);
-            //DrawRectangle(player.rect.x,  floor_to_muiltiple(player.rect.y, TILE_SIZE),TILE_SIZE, TILE_SIZE, YELLOW );
-
-
 
 
         EndTextureMode();
