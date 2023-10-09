@@ -97,11 +97,9 @@ int main()
             ClearBackground(WHITE);
             DrawFPS(10, 10);
 
-            DrawRectangle(((int)(player.rect.x+player.p_offset.x)/TILE_SIZE)*TILE_SIZE, ((int)((player.rect.y)/TILE_SIZE))*TILE_SIZE, ((int)((player.rect.width)/TILE_SIZE))*TILE_SIZE,  (int)((player.rect.y+player.rect.height)/TILE_SIZE)*TILE_SIZE, GREEN);
-            DrawRectangle(player.rect.x, player.rect.y, player.rect.width, player.rect.height , DARKGREEN);
+            //DrawRectangle(player.rect.x, player.rect.y, player.rect.width, player.rect.height , DARKGREEN);
             
             
-            printf("%i, %i, %f, %f--------\n", (int)player.rect.x, (int)player.rect.y, player.rect.x, player.rect.y);
             DrawTexture(test_anim.frame_arr[anim_m_test.frame], player.rect.x, player.rect.y, WHITE);
             DrawRectangle(selected_tile.x, selected_tile.y, TILE_SIZE, TILE_SIZE, MOUSE_OVERLAY);
             RenderWorld(world.arr, world.size);

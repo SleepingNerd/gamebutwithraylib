@@ -32,7 +32,6 @@ void ProcessInput(Player *player, bool left, bool right, bool jump)
 
     if (jump)
     {
-        printf("?????????????????,,");
         player->velocity.y = player->jump_force;
     } 
 }
@@ -40,7 +39,6 @@ void ProcessInput(Player *player, bool left, bool right, bool jump)
 // Applies and updates velocity and position, applies gravity
 void MoveAndUpdate(Player *player, float delta, World world)
 {
-
     int left_tile = (player->rect.x)/TILE_SIZE;
     int right_tile = (player->rect.x+player->p_offset.x)/TILE_SIZE;
 
@@ -57,8 +55,7 @@ void MoveAndUpdate(Player *player, float delta, World world)
         bottom_tile = (player->rect.y+player->p_offset.y)/TILE_SIZE;
 
 
-        printf("%f\n", (player->rect.y+player->p_offset.y));
-        printf("%i, %i, %f ..\n", top_tile, bottom_tile, player->rect.y);
+       
         for(int i = left_tile; i<=right_tile; i++)
         {
             // Apply setback if moved into tile
@@ -77,43 +74,64 @@ void MoveAndUpdate(Player *player, float delta, World world)
 
     else if (player->velocity.y< 0)
     {
-        top_tile = (player->rect.y+player->p_offset.y)/TILE_SIZE;
+        top_tile = (player->rect.y)/TILE_SIZE;
+
         for(int i = left_tile; i<=right_tile; i++)
         {
             // Apply setback if moved into tile
-            if (world.arr[(i)+(bottom_tile *world.size.x)].type == SAND)
+            if (world.arr[(i)+(top_tile *world.size.x)].type == SAND)
             {
-                player->rect.y = (bottom_tile)*TILE_SIZE-player->rect.height;
+                player->rect.y = (top_tile+1)*TILE_SIZE;
                 break;
             }
 
         }
-        
-
+        // Recalculate top and bottom after movement
+        top_tile = (player->rect.y+player->p_offset.y)/TILE_SIZE;
+        bottom_tile = (player->rect.y+player->p_offset.y)/TILE_SIZE;
     }
 
 
     
-    left_tile = (player->rect.x)/TILE_SIZE;
-    right_tile = (player->rect.x+player->p_offset.x)/TILE_SIZE;
-    
-
+   
 
     
 
     player->rect.x += player->velocity.x*delta;
+
+    left_tile = (player->rect.x)/TILE_SIZE;
+    right_tile = (player->rect.x+player->p_offset.x)/TILE_SIZE;
+    
+
     // Going right
     if (player->velocity.x > 0)
     {
+
         right_tile = (player->rect.x+player->p_offset.x)/TILE_SIZE;
+
         for(int i = top_tile; i<= bottom_tile; i++)
         {
             if (world.arr[(right_tile)+(i *world.size.x)].type == SAND)
             {
                 player->rect.x = right_tile*TILE_SIZE-player->rect.width;
+
+            }
+        }
+
+    }
+
+    else if (player->velocity.x <0)
+    {
+        for(int i = top_tile; i<= bottom_tile; i++)
+        {
+            if (world.arr[(left_tile)+(i *world.size.x)].type == SAND)
+            {
+                player->rect.x = right_tile*TILE_SIZE;
             }
         }
     }
+
+
 
 
 
@@ -123,9 +141,8 @@ void MoveAndUpdate(Player *player, float delta, World world)
     {
         player->velocity.y = 10;
     }
-
-    printf("%f\n", (player->rect.y+player->p_offset.y));
-    printf("%i, %i, %f ...\n", top_tile, bottom_tile, player->rect.y);
 }
+
+
 
 #endif // PLAYER_H
