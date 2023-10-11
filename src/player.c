@@ -48,6 +48,7 @@ void MoveAndUpdate(Player *player, float delta, World world)
     player->rect.y += player->velocity.y*delta;
 
     
+    printf("B: %f\n", player->rect.y);
 
     // Going down
     if (player->velocity.y> 0)
@@ -58,6 +59,7 @@ void MoveAndUpdate(Player *player, float delta, World world)
        
         for(int i = left_tile; i<=right_tile; i++)
         {
+            //printf("%i\n", left_tile );
             // Apply setback if moved into tile
             if (world.arr[(i)+(bottom_tile *world.size.x)].type == SAND)
             {
@@ -68,7 +70,7 @@ void MoveAndUpdate(Player *player, float delta, World world)
         }
 
         // Recalculate top and bottom after movement
-        top_tile = (player->rect.y+player->p_offset.y)/TILE_SIZE;
+        top_tile = (player->rect.y)/TILE_SIZE;
         bottom_tile = (player->rect.y+player->p_offset.y)/TILE_SIZE;
     }
 
@@ -87,20 +89,22 @@ void MoveAndUpdate(Player *player, float delta, World world)
 
         }
         // Recalculate top and bottom after movement
-        top_tile = (player->rect.y+player->p_offset.y)/TILE_SIZE;
+        top_tile = (player->rect.y)/TILE_SIZE;
         bottom_tile = (player->rect.y+player->p_offset.y)/TILE_SIZE;
     }
 
 
     
    
+    printf("BA: %f\n", player->rect.y);
 
     
-
+    
     player->rect.x += player->velocity.x*delta;
 
     left_tile = (player->rect.x)/TILE_SIZE;
     right_tile = (player->rect.x+player->p_offset.x)/TILE_SIZE;
+
     
 
     // Going right
@@ -117,6 +121,7 @@ void MoveAndUpdate(Player *player, float delta, World world)
 
             }
         }
+        player->facing = RIGHT;
 
     }
 
@@ -126,9 +131,10 @@ void MoveAndUpdate(Player *player, float delta, World world)
         {
             if (world.arr[(left_tile)+(i *world.size.x)].type == SAND)
             {
-                player->rect.x = right_tile*TILE_SIZE;
+                player->rect.x = (left_tile+1)*TILE_SIZE;
             }
         }
+        player->facing = LEFT;
     }
 
 
@@ -137,9 +143,9 @@ void MoveAndUpdate(Player *player, float delta, World world)
 
     // Applying gravity    
     player->velocity.y += player->gravity*delta;
-    if (player->velocity.y < 10)
+    if (player->velocity.y < 5)
     {
-        player->velocity.y = 10;
+        player->velocity.y = 5;
     }
 }
 

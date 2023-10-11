@@ -7,7 +7,7 @@
 
 
 
-#define TILE_SIZE 16
+#define TILE_SIZE 1
 #define TILES 1
 
 // Macro to conver x and y coordinates into the

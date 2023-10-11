@@ -35,7 +35,15 @@ void LoadTileTextures()
 
 void ChangeTile(Tile *world, Vector2i world_size, Vector2i position)
 {
-    world[position.y*world_size.x +position.x].type = SAND;
+    for(int y= -5; y++; y<=5)
+    {
+        for (int x = -5; x++; x<=5)
+        {
+        
+            world[(position.y+y)*(world_size.x) +position.x+x].type = SAND;
+        }
+    }
+
 }
 
 void RenderWorld(Tile *world, Vector2i world_size)
@@ -47,7 +55,7 @@ void RenderWorld(Tile *world, Vector2i world_size)
             if (world[y*world_size.x +x].type == SAND)
             {
                 DrawRectangle(x*TILE_SIZE,y*TILE_SIZE, TILE_SIZE, TILE_SIZE, BEIGE);
-                DrawTexture(textures[world[y*world_size.x +x].type-1],x*TILE_SIZE,y*TILE_SIZE, WHITE);
+                //DrawTexture(textures[world[y*world_size.x +x].type-1],x*TILE_SIZE,y*TILE_SIZE, WHITE);
             }
 
         }

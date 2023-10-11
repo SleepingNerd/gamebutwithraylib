@@ -35,8 +35,8 @@ int main()
 
     Vector2i tile_size = {.x = 16, .y = 16};
     World world;
-    world.size.x = (screenWidth/16);
-    world.size.y = (screenHeight/16);
+    world.size.x = (screenWidth/TILE_SIZE);
+    world.size.y = (screenHeight/TILE_SIZE);
     world.arr = calloc(world.size.x*world.size.y, sizeof(Tile));
 
     Animation test_anim = LoadAnimation("assets/player/player.png", 5, 1.0f);
@@ -44,10 +44,13 @@ int main()
     LoadTileTextures();
 
     Player player = {.speed=20, .rect = {.height = 16, .width = 8, .x = 40, .y=200}, .state=0, .velocity={0}, .jump_force=0, .gravity=0, .p_offset={0}};
-    CalculateJump(&player, 40, 1);
+    player.facing = RIGHT;
+    CalculateJump(&player, 100, 1);
     CalculateSize(&player, 16, 16);
-    player.gravity = 1;
-    player.jump_force =-10;
+
+
+    Rectangle player_img_rect = {.height=16, .width=8,.x=0,.y=0};
+
 
     float delta_t;
 
@@ -97,10 +100,14 @@ int main()
             ClearBackground(WHITE);
             DrawFPS(10, 10);
 
-            //DrawRectangle(player.rect.x, player.rect.y, player.rect.width, player.rect.height , DARKGREEN);
+            DrawRectangle(player.rect.x, player.rect.y, player.rect.width, player.rect.height , DARKGREEN);
             
-            
-            DrawTexture(test_anim.frame_arr[anim_m_test.frame], player.rect.x, player.rect.y, WHITE);
+            player_img_rect.width= fabs(player_img_rect.width)*player.facing;
+
+
+            Vector2 offset = {.x = (int)player.rect.x, .y= (int)player.rect.y};
+            DrawTextureRec(test_anim.frame_arr[anim_m_test.frame],player_img_rect, offset, WHITE);
+
             DrawRectangle(selected_tile.x, selected_tile.y, TILE_SIZE, TILE_SIZE, MOUSE_OVERLAY);
             RenderWorld(world.arr, world.size);
 

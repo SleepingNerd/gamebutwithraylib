@@ -9,6 +9,11 @@ typedef enum {
     RUN = 1
 } PlayerState;
 
+typedef enum{
+    LEFT = -1,
+    RIGHT = 1
+} HorizontalFacing;
+
 // p
 typedef struct Player{
     Rectangle rect;
@@ -16,6 +21,7 @@ typedef struct Player{
     Vector2 velocity;
     PlayerState state;
 
+    HorizontalFacing facing;
     int speed;
     int jump_force;
     int gravity;
