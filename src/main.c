@@ -39,14 +39,15 @@ int main()
     world.size.y = (screenHeight/TILE_SIZE);
     world.arr = calloc(world.size.x*world.size.y, sizeof(Tile));
 
-    Animation test_anim = LoadAnimation("assets/player/player.png", 5, 1.0f);
+    Animation test_anim = LoadAnimation("assets/player/player.png", 5, 0.3f);
     AnimationManager anim_m_test = {.frame = 0, .delta = 0};
     LoadTileTextures();
 
-    Player player = {.speed=20, .rect = {.height = 16, .width = 8, .x = 40, .y=200}, .state=0, .velocity={0}, .jump_force=0, .gravity=0, .p_offset={0}, .slide_up=3};
+    Player player = {.speed=20, .rect = {.height = 16, .width = 8, .x = 40, .y=200}, .state=0, .velocity={0}, .jump_force=0, .gravity=0, .p_offset={0}, .slide_up=2};
     player.facing = RIGHT;
     CalculateJump(&player, 100, 1);
-    CalculateSize(&player, 16, 16);
+    CalculateSize(&player, 8, 16);
+    
 
 
     Rectangle player_img_rect = {.height=16, .width=8,.x=0,.y=0};
@@ -99,8 +100,8 @@ int main()
         BeginTextureMode(screen);
             ClearBackground(WHITE);
             DrawFPS(10, 10);
-
-            DrawRectangle(player.rect.x, player.rect.y, player.rect.width, player.rect.height , DARKGREEN);
+            //printf("%f\n", player.rect.width);
+            //DrawRectangle(player.rect.x, player.rect.y, player.rect.width, player.rect.height , DARKGREEN);
             
             player_img_rect.width= fabs(player_img_rect.width)*player.facing;
 

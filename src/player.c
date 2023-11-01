@@ -19,7 +19,7 @@ void CalculateJump(Player *player, int height, float peak_time)
 void CalculateSize(Player *player, int width, int height)
 {
     player->rect.width = width;
-    player->rect.width = height;
+    player->rect.height = height;
 
     player->p_offset.x = width-1;
     player->p_offset.y = height-1;
@@ -126,13 +126,12 @@ bool RightCollision(Player *player, World world, int top_tile, int bottom_tile)
                         {
                             return false;
                         }
-                        printf("f");
                         
                     }  
                 }
                 player->rect.y = original_y;
 
-                
+                printf("??? %f\n", player->rect.width);
                 player->rect.x = right_tile*TILE_SIZE-player->rect.width;
                 return true;
             }
