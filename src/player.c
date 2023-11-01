@@ -45,10 +45,15 @@ void MoveAndUpdate(Player *player, float delta, World world)
     int top_tile;
     int bottom_tile;
     
-    player->rect.y += player->velocity.y*delta;
+
+    float to_be_moved_y = player->velocity.y*delta;
+    player->rect.y += to_be_moved_y;
+
 
     
-    printf("B: %f\n", player->rect.y);
+
+    
+   
 
     // Going down
     if (player->velocity.y> 0)
@@ -59,7 +64,6 @@ void MoveAndUpdate(Player *player, float delta, World world)
        
         for(int i = left_tile; i<=right_tile; i++)
         {
-            //printf("%i\n", left_tile );
             // Apply setback if moved into tile
             if (world.arr[(i)+(bottom_tile *world.size.x)].type == SAND)
             {
@@ -96,7 +100,6 @@ void MoveAndUpdate(Player *player, float delta, World world)
 
     
    
-    printf("BA: %f\n", player->rect.y);
 
     
     
