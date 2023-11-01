@@ -36,6 +36,26 @@ void ProcessInput(Player *player, bool left, bool right, bool jump)
     } 
 }
 
+
+
+bool Collision(Player *player, World world, int left_tile, int right_tile, int top_tile, int bottom_tile)
+{
+    
+    for (int x = left_tile; x<=right_tile; x++)
+    {
+        printf("D");
+        for (int y = top_tile; x<=bottom_tile; y++)
+        {
+            if (world.arr[(x)+(y *world.size.x)].type == SAND)
+            {
+                printf("A");
+                return true;
+            }
+        }
+    }
+    return false;
+
+}
 // Assumes player last moved down and applies collision accordingly, should be used as sparingly as possible,
 // Always check if player actually crossed a tile before calling
 bool DownCollision(Player *player, World world, int left_tile, int right_tile)
@@ -80,12 +100,39 @@ bool UpCollision(Player *player, World world, int left_tile, int right_tile)
 // Always check if player actually crossed a tile before calling
 bool RightCollision(Player *player, World world, int top_tile, int bottom_tile)
 {
-    int right_tile = (player->rect.x+player->p_offset.x)/TILE_SIZE;
+
+        int right_tile = (player->rect.x+player->p_offset.x)/TILE_SIZE;
+
 
         for(int i = top_tile; i<= bottom_tile; i++)
         {
             if (world.arr[(right_tile)+(i *world.size.x)].type == SAND)
             {
+                
+                float original_y = player->rect.y;
+                int left_tile = player->rect.x/TILE_SIZE;
+                float original_x = player->rect.x;
+                
+
+                printf("X %i ,%i ,%i\n", (bottom_tile-player->slide_up), bottom_tile, player->slide_up);
+                for (int h = bottom_tile-1; h>=(bottom_tile-player->slide_up); h--)
+                {
+                    if (world.arr[(right_tile)+((h) *world.size.x)].type != SAND)
+                    {   
+                        player->rect.y = (h-player->p_offset.y)*TILE_SIZE;
+                        printf("e");
+                        if (!Collision(player, world, left_tile, right_tile, (bottom_tile+(player->p_offset.y/TILE_SIZE)), h))
+                        {
+                            player->rect.x = original_x;
+                            return false;
+                        }
+                        printf("f");
+                        
+                    }  
+                }
+                player->rect.y = original_y;
+
+                
                 player->rect.x = right_tile*TILE_SIZE-player->rect.width;
                 return true;
             }
@@ -100,6 +147,24 @@ bool LeftCollision(Player *player, World world, int top_tile, int bottom_tile)
     {
         if (world.arr[(left_tile)+(i *world.size.x)].type == SAND)
         {
+            float original_y = player->rect.y;
+            int right_tile = (player->rect.x+player->p_offset.x)/TILE_SIZE;;
+                
+
+            for (int h = bottom_tile-1; h>=(bottom_tile-player->slide_up); h--)
+            {
+                printf("%i\n", h);
+                if (world.arr[(left_tile)+((h) *world.size.x)].type != SAND)
+                {   
+                    player->rect.y = (h-player->p_offset.y)*TILE_SIZE;
+                    if (!Collision(player, world, left_tile, right_tile, bottom_tile+player->p_offset.y/TILE_SIZE, h))
+                    {
+                        return false;
+                    }
+                        
+                }  
+            }
+            player->rect.y = original_y;
             player->rect.x = (left_tile+1)*TILE_SIZE;
             return true;
         }
@@ -145,7 +210,10 @@ void MoveAndUpdate(Player *player, float delta, World world)
         if ((offset_from_tile.y+move_offset.y) >= 1)
         {
             
-            DownCollision(player, world, left_tile, right_tile);
+            if (DownCollision(player, world, left_tile, right_tile))
+            {
+                player->velocity.y = 0;
+            }
         }
 
 
