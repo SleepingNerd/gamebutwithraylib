@@ -40,12 +40,13 @@ void ProcessInput(Player *player, bool left, bool right, bool jump)
 
 bool Collision(Player *player, World world, int left_tile, int right_tile, int top_tile, int bottom_tile)
 {
-    
+    printf("%i; %i, %i; %i\n", left_tile,right_tile,top_tile,bottom_tile);
     for (int x = left_tile; x<=right_tile; x++)
     {
-        printf("D");
-        for (int y = top_tile; x<=bottom_tile; y++)
+        
+        for (int y = top_tile; y<=bottom_tile; y++)
         {
+            printf("%i, %i\n", x, y);
             if (world.arr[(x)+(y *world.size.x)].type == SAND)
             {
                 printf("A");
@@ -53,6 +54,7 @@ bool Collision(Player *player, World world, int left_tile, int right_tile, int t
             }
         }
     }
+    printf("...\n");
     return false;
 
 }
@@ -120,10 +122,8 @@ bool RightCollision(Player *player, World world, int top_tile, int bottom_tile)
                     if (world.arr[(right_tile)+((h) *world.size.x)].type != SAND)
                     {   
                         player->rect.y = (h-player->p_offset.y)*TILE_SIZE;
-                        printf("e");
-                        if (!Collision(player, world, left_tile, right_tile, (bottom_tile+(player->p_offset.y/TILE_SIZE)), h))
+                        if (!Collision(player, world, left_tile, right_tile, (bottom_tile*TILE_SIZE-player->p_offset.y)/TILE_SIZE, h))
                         {
-                            player->rect.x = original_x;
                             return false;
                         }
                         printf("f");
@@ -157,7 +157,7 @@ bool LeftCollision(Player *player, World world, int top_tile, int bottom_tile)
                 if (world.arr[(left_tile)+((h) *world.size.x)].type != SAND)
                 {   
                     player->rect.y = (h-player->p_offset.y)*TILE_SIZE;
-                    if (!Collision(player, world, left_tile, right_tile, bottom_tile+player->p_offset.y/TILE_SIZE, h))
+                    if (!Collision(player, world, left_tile, right_tile, bottom_tile-player->p_offset.y/TILE_SIZE, h))
                     {
                         return false;
                     }
