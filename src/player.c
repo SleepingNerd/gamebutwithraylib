@@ -38,7 +38,7 @@ void ProcessInput(Player *player, bool left, bool right, bool jump)
 
 // Assumes player last moved down and applies collision accordingly, should be used as sparingly as possible,
 // Always check if player actually crossed a tile before calling
-void DownCollision(Player *player, World world, int left_tile, int right_tile)
+bool DownCollision(Player *player, World world, int left_tile, int right_tile)
 {
     int bottom_tile = (player->rect.y+player->p_offset.y)/TILE_SIZE;
 
@@ -50,15 +50,17 @@ void DownCollision(Player *player, World world, int left_tile, int right_tile)
             if (world.arr[(i)+(bottom_tile *world.size.x)].type == SAND)
             {
                 player->rect.y = (bottom_tile)*TILE_SIZE-player->rect.height;
-                break;
+                return true;
+                
             }
 
         }
+    return false;
 }
 
 // Assumes player last moved up and applies collision accordingly, should be used as sparingly as possible,
 // Always check if player actually crossed a tile before calling
-void UpCollision(Player *player, World world, int left_tile, int right_tile)
+bool UpCollision(Player *player, World world, int left_tile, int right_tile)
 {
     int top_tile = (player->rect.y)/TILE_SIZE;
 
@@ -68,15 +70,15 @@ void UpCollision(Player *player, World world, int left_tile, int right_tile)
         if (world.arr[(i)+(top_tile *world.size.x)].type == SAND)
         {
             player->rect.y = (top_tile+1)*TILE_SIZE;
-            break;
+            return true;
         }
-
     }
+    return false;
 }
 
 // Assumes player last moved right and applies collision accordingly, should be used as sparingly as possible,
 // Always check if player actually crossed a tile before calling
-void RightCollision(Player *player, World world, int top_tile, int bottom_tile)
+bool RightCollision(Player *player, World world, int top_tile, int bottom_tile)
 {
     int right_tile = (player->rect.x+player->p_offset.x)/TILE_SIZE;
 
@@ -85,11 +87,13 @@ void RightCollision(Player *player, World world, int top_tile, int bottom_tile)
             if (world.arr[(right_tile)+(i *world.size.x)].type == SAND)
             {
                 player->rect.x = right_tile*TILE_SIZE-player->rect.width;
+                return true;
             }
         }
+    return false;
 }
 
-void LeftCollision(Player *player, World world, int top_tile, int bottom_tile)
+bool LeftCollision(Player *player, World world, int top_tile, int bottom_tile)
 {
     int left_tile = (player->rect.x)/TILE_SIZE;
     for(int i = top_tile; i<= bottom_tile; i++)
@@ -97,10 +101,11 @@ void LeftCollision(Player *player, World world, int top_tile, int bottom_tile)
         if (world.arr[(left_tile)+(i *world.size.x)].type == SAND)
         {
             player->rect.x = (left_tile+1)*TILE_SIZE;
+            return true;
         }
     }
+    return false;
 }
-
 
 
 // Applies and updates velocity and position, applies gravity

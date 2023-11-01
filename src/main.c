@@ -43,7 +43,7 @@ int main()
     AnimationManager anim_m_test = {.frame = 0, .delta = 0};
     LoadTileTextures();
 
-    Player player = {.speed=20, .rect = {.height = 16, .width = 8, .x = 40, .y=200}, .state=0, .velocity={0}, .jump_force=0, .gravity=0, .p_offset={0}};
+    Player player = {.speed=20, .rect = {.height = 16, .width = 8, .x = 40, .y=200}, .state=0, .velocity={0}, .jump_force=0, .gravity=0, .p_offset={0}, .slide_up=3};
     player.facing = RIGHT;
     CalculateJump(&player, 100, 1);
     CalculateSize(&player, 16, 16);

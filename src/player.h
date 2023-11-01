@@ -25,6 +25,7 @@ typedef struct Player{
     int speed;
     int jump_force;
     int gravity;
+    int slide_up // How much tiles it's allowed to slide up
 
 
 } Player;
