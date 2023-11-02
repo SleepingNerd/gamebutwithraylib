@@ -58,6 +58,7 @@ bool Collision(Player *player, World world, int left_tile, int right_tile, int t
     return false;
 
 }
+
 // Assumes player last moved down and applies collision accordingly, should be used as sparingly as possible,
 // Always check if player actually crossed a tile before calling
 bool DownCollision(Player *player, World world, int left_tile, int right_tile)
@@ -116,7 +117,7 @@ bool RightCollision(Player *player, World world, int top_tile, int bottom_tile)
                 float original_x = player->rect.x;
                 
 
-                printf("X %i ,%i ,%i\n", (bottom_tile-player->slide_up), bottom_tile, player->slide_up);
+                // This is extremely slow
                 for (int h = bottom_tile-1; h>=(bottom_tile-player->slide_up); h--)
                 {
                     if (world.arr[(right_tile)+((h) *world.size.x)].type != SAND)
@@ -171,111 +172,28 @@ bool LeftCollision(Player *player, World world, int top_tile, int bottom_tile)
     return false;
 }
 
-
-// Applies and updates velocity and position, applies gravity
-void MoveAndUpdate(Player *player, float delta, World world)
+bool HorizontalMoveAndUpdate(Player *player, World world, float delta)
 {
-    int left_tile = (player->rect.x)/TILE_SIZE;
-    int right_tile = (player->rect.x+player->p_offset.x)/TILE_SIZE;
 
-    int top_tile;
-    int bottom_tile;
+    int top_tile = (player->rect.y)/TILE_SIZE;
+    int bottom_tile = (player->rect.y+player->p_offset.y)/TILE_SIZE;
+
+    // All relate to movement on x axis:
+    float to_be_moved =  player->velocity.x*delta;
+    float offset_from_tile =  fmodf(player->rect.x, TILE_SIZE);
+    float move_offset = fmodf(player->velocity.x*delta, TILE_SIZE);
     
-    
-    Vector2 to_be_moved = {.y = player->velocity.y*delta, .x =player->velocity.x*delta};
-    Vector2 offset_from_tile = {.x= fmodf(player->rect.x, TILE_SIZE), .y= fmodf(player->rect.y, TILE_SIZE)};
-    Vector2 move_offset = {.x =  fmodf(player->velocity.x*delta, TILE_SIZE), .y= fmodf(player->velocity.y*delta, TILE_SIZE)};
-
-   
-
-   
-
-    // Going down
-    if (player->velocity.y> 0)
-    {
-
-        for (int i = 0; i<(int)to_be_moved.y; i+=TILE_SIZE)
-        {
-            player->rect.y += TILE_SIZE;
-            DownCollision(player, world, left_tile, right_tile);
-
-        }
-        
-
-        player->rect.y += move_offset.y;
-
-        
-        // Collide again
-        if ((offset_from_tile.y+move_offset.y) >= 1)
-        {
-            
-            if (DownCollision(player, world, left_tile, right_tile))
-            {
-                player->velocity.y = 0;
-            }
-        }
-
-
-
-        // Recalculate top and bottom after movement
-        top_tile = (player->rect.y)/TILE_SIZE;
-        bottom_tile = (player->rect.y+player->p_offset.y)/TILE_SIZE;
-    }
-
-    else if (player->velocity.y< 0)
-    {
-        
-        for (int i = 0; i>(int)to_be_moved.y; i-=TILE_SIZE)
-        {
-            player->rect.y -= TILE_SIZE;
-            UpCollision(player, world, left_tile, right_tile);
-
-        }
-        
-        player->rect.y += move_offset.y;
-
-        // Collide again
-        if ((offset_from_tile.y+move_offset.y) <= 0)
-        {
-            
-            UpCollision(player, world, left_tile, right_tile);
-        }
-
-
-
-
-
-
-        // Recalculate top and bottom after movement
-        top_tile = (player->rect.y)/TILE_SIZE;
-        bottom_tile = (player->rect.y+player->p_offset.y)/TILE_SIZE;
-    }
-
-
-    
-   
-
-    
-    
-
-    left_tile = (player->rect.x)/TILE_SIZE;
-    right_tile = (player->rect.x+player->p_offset.x)/TILE_SIZE;
-
-
-
-    
-
     // Going right
     if (player->velocity.x > 0)
     {
-        for (int i = 0; i<(int)to_be_moved.x; i+=TILE_SIZE)
+        for (int i = 0; i<(int)to_be_moved; i+=TILE_SIZE)
         {
             player->rect.x += 1;
             RightCollision(player, world, top_tile, bottom_tile);
         }
 
-        player->rect.x += move_offset.x;
-        if ((offset_from_tile.x+move_offset.x)>=1)
+        player->rect.x += move_offset;
+        if ((offset_from_tile+move_offset)>=1)
         {
             RightCollision(player, world, top_tile, bottom_tile);
         }
@@ -286,23 +204,100 @@ void MoveAndUpdate(Player *player, float delta, World world)
 
     else if (player->velocity.x <0)
     {
-        for (int i = 0; i>(int)to_be_moved.x; i-=TILE_SIZE)
+        for (int i = 0; i>(int)to_be_moved; i-=TILE_SIZE)
         {
             player->rect.x -= 1;
             LeftCollision(player, world, top_tile, bottom_tile);
         }
 
-        player->rect.x += move_offset.x;
-        if ((offset_from_tile.x+move_offset.x)<=0)
+        player->rect.x += move_offset;
+        if ((offset_from_tile+move_offset)<=0)
         {
             LeftCollision(player, world, top_tile, bottom_tile);
         }
         
         player->facing = LEFT;
     }
+}
+
+bool VerticalMoveAndUpdate(Player *player, World world, float delta)
+{
+    // Calculate left and right tile, this might still be optimised
+    int left_tile = (player->rect.x)/TILE_SIZE;
+    int right_tile = (player->rect.x+player->p_offset.x)/TILE_SIZE;
+
+    // All relate to movement on y axis:
+    float to_be_moved =  player->velocity.y*delta;
+    float offset_from_tile =  fmodf(player->rect.y, TILE_SIZE);
+    float move_offset = fmodf(player->velocity.y*delta, TILE_SIZE);
+
+     // Going down
+    if (player->velocity.y> 0)
+    {
+
+        for (int i = 0; i<(int)to_be_moved; i+=TILE_SIZE)
+        {
+            player->rect.y += TILE_SIZE;
+            if (DownCollision(player, world, left_tile, right_tile))
+            {
+                return true;
+            }
+            
+
+        }
+        player->rect.y += move_offset;
+
+        
+        // Collide again
+        if ((offset_from_tile+move_offset) >= 1)
+        {
+            
+            if (DownCollision(player, world, left_tile, right_tile))
+            {
+                player->velocity.y = 0;
+            }
+        }
+    }
+
+    else if (player->velocity.y< 0)
+    {
+        
+        for (int i = 0; i>(int)to_be_moved; i-=TILE_SIZE)
+        {
+            player->rect.y -= TILE_SIZE;
+            if (UpCollision(player, world, left_tile, right_tile))
+            {
+                return true;
+            }
+
+        }
+        
+        player->rect.y += move_offset;
+
+        // Collide again
+        if ((offset_from_tile+move_offset) <= 0)
+        {
+            
+            UpCollision(player, world, left_tile, right_tile);
+        }
+    }
+
+}
 
 
 
+
+
+
+// Applies and updates velocity and position, applies gravity
+void MoveAndUpdate(Player *player, float delta, World world)
+{
+
+
+    VerticalMoveAndUpdate(player, world, delta);
+
+    
+   HorizontalMoveAndUpdate(player, world, delta);
 
 
     // Applying gravity    

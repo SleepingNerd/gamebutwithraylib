@@ -26,6 +26,7 @@ typedef struct AnimationManager {
 //
 typedef struct AnimationStateMachine {
     char state;
+    AnimationManager *animations;
 } AnimationStateMachine;
 
 Animation LoadAnimation(const char *path, frame_i frames, float time_between_frames);
