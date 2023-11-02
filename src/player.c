@@ -118,23 +118,47 @@ bool RightCollision(Player *player, World world, int top_tile, int bottom_tile)
                 
 
                 // This is extremely slow
-                for (int h = bottom_tile-1; h>=(bottom_tile-player->slide_up); h--)
-                {
-                    if (world.arr[(right_tile)+((h) *world.size.x)].type != SAND)
-                    {   
-                        player->rect.y = (h-player->p_offset.y)*TILE_SIZE;
-                        if (!Collision(player, world, left_tile, right_tile, (bottom_tile*TILE_SIZE-player->p_offset.y)/TILE_SIZE, h))
-                        {
-                            return false;
-                        }
-                        
-                    }  
-                }
-                player->rect.y = original_y;
+                // From 1 tile above the bottom_tile to (incl.) slide_up above bottom_tile
+                // The first slide_up times I should do this:
 
-                printf("??? %f\n", player->rect.width);
-                player->rect.x = right_tile*TILE_SIZE-player->rect.width;
-                return true;
+
+                // How many tiles the player would slide up 
+                // (if he were to slide up the current tile)
+                int slide_up_tile = (bottom_tile-i)+1;
+
+                // If there is a tile blocking movement that is above player->slide_up
+                if (slide_up_tile > player->slide_up)
+                {
+                    player->rect.x = right_tile*TILE_SIZE-player->rect.width;
+                    return true;
+                }
+
+                // If there is a possibility to slide_up
+                else 
+                {
+                    // Check the top slide_up_tile tiles, this is just done by looping those tiles
+                    // 
+                    int left_tile = player->rect.x/TILE_SIZE;
+                    int new_top_tile = top_tile - slide_up_tile;
+
+                    for (int x = left_tile; x<=right_tile; x++)
+                    {
+                        for(int y = top_tile-1; y>=new_top_tile; y--)
+                        {
+
+                            if (world.arr[(x)+(y *world.size.x)].type == SAND)
+                            {
+                                player->rect.x = right_tile*TILE_SIZE-player->rect.width;
+                                return true;
+                            }
+                        }
+                    }
+
+
+                    player->rect.y = (new_top_tile)*TILE_SIZE;
+                    return false;
+                }
+
             }
         }
     return false;
@@ -147,24 +171,44 @@ bool LeftCollision(Player *player, World world, int top_tile, int bottom_tile)
     {
         if (world.arr[(left_tile)+(i *world.size.x)].type == SAND)
         {
-            float original_y = player->rect.y;
-            int right_tile = (player->rect.x+player->p_offset.x)/TILE_SIZE;;
-                
+            
+             // How many tiles the player would slide up 
+            // (if he were to slide up the current tile)
+            int slide_up_tile = (bottom_tile-i)+1;
 
-            for (int h = bottom_tile-1; h>=(bottom_tile-player->slide_up); h--)
+            // If there is a tile blocking movement that is above player->slide_up
+            if (slide_up_tile > player->slide_up)
             {
-                printf("%i\n", h);
-                if (world.arr[(left_tile)+((h) *world.size.x)].type != SAND)
-                {   
-                    player->rect.y = (h-player->p_offset.y)*TILE_SIZE;
-                    if (!Collision(player, world, left_tile, right_tile, bottom_tile-player->p_offset.y/TILE_SIZE, h))
-                    {
-                        return false;
-                    }
-                        
-                }  
+                player->rect.x = (left_tile+1)*TILE_SIZE;
+                return true;
             }
-            player->rect.y = original_y;
+
+            // If there is a possibility to slide_up
+            else 
+            {
+                // Check the top slide_up_tile tiles, this is just done by looping those tiles
+                // 
+                int right_tile = (player->rect.x+player->p_offset.x)/TILE_SIZE;;
+                int new_top_tile = top_tile - slide_up_tile;
+
+                for (int x = left_tile; x<=right_tile; x++)
+                {
+                    for(int y = top_tile-1; y>=new_top_tile; y--)
+                    {
+
+                        if (world.arr[(x)+(y *world.size.x)].type == SAND)
+                        {
+                            player->rect.x = (left_tile+1)*TILE_SIZE;
+                            return true;
+                        }
+                    }
+                }
+
+
+                player->rect.y = (new_top_tile)*TILE_SIZE;
+                return false;
+                }
+       
             player->rect.x = (left_tile+1)*TILE_SIZE;
             return true;
         }
@@ -189,7 +233,11 @@ bool HorizontalMoveAndUpdate(Player *player, World world, float delta)
         for (int i = 0; i<(int)to_be_moved; i+=TILE_SIZE)
         {
             player->rect.x += 1;
-            RightCollision(player, world, top_tile, bottom_tile);
+
+            if (RightCollision(player, world, top_tile, bottom_tile))
+            {
+                return true;
+            }
         }
 
         player->rect.x += move_offset;
@@ -207,7 +255,10 @@ bool HorizontalMoveAndUpdate(Player *player, World world, float delta)
         for (int i = 0; i>(int)to_be_moved; i-=TILE_SIZE)
         {
             player->rect.x -= 1;
-            LeftCollision(player, world, top_tile, bottom_tile);
+            if (LeftCollision(player, world, top_tile, bottom_tile))
+            {
+                return true;
+            }
         }
 
         player->rect.x += move_offset;
