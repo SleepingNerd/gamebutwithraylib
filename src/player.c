@@ -30,7 +30,7 @@ void ProcessInput(Player *player, bool left, bool right, bool jump)
     player->velocity.x = (right- left)*player->speed;
 
 
-    if (jump)
+    if (jump && player->grounded)
     {
         player->velocity.y = player->jump_force;
     } 
@@ -291,6 +291,7 @@ bool VerticalMoveAndUpdate(Player *player, World world, float delta)
             player->rect.y += TILE_SIZE;
             if (DownCollision(player, world, left_tile, right_tile))
             {
+                player->grounded=true;
                 return true;
             }
             
@@ -305,6 +306,7 @@ bool VerticalMoveAndUpdate(Player *player, World world, float delta)
             
             if (DownCollision(player, world, left_tile, right_tile))
             {
+                player->grounded=true;
                 player->velocity.y = 0;
             }
         }
@@ -344,18 +346,20 @@ bool VerticalMoveAndUpdate(Player *player, World world, float delta)
 void MoveAndUpdate(Player *player, float delta, World world)
 {
 
+    player->grounded = false;
+
 
     VerticalMoveAndUpdate(player, world, delta);
 
     
-   HorizontalMoveAndUpdate(player, world, delta);
+    HorizontalMoveAndUpdate(player, world, delta);
 
 
     // Applying gravity    
     player->velocity.y += player->gravity*delta;
-    if (player->velocity.y < 5)
+    if (player->velocity.y > 100)
     {
-        player->velocity.y = 5;
+        player->velocity.y = 100;
     }
 }
 
