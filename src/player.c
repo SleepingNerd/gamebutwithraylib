@@ -40,21 +40,17 @@ void ProcessInput(Player *player, bool left, bool right, bool jump)
 
 bool Collision(Player *player, World world, int left_tile, int right_tile, int top_tile, int bottom_tile)
 {
-    printf("%i; %i, %i; %i\n", left_tile,right_tile,top_tile,bottom_tile);
     for (int x = left_tile; x<=right_tile; x++)
     {
         
         for (int y = top_tile; y<=bottom_tile; y++)
         {
-            printf("%i, %i\n", x, y);
             if (world.arr[(x)+(y *world.size.x)].type == SAND)
             {
-                printf("A");
                 return true;
             }
         }
     }
-    printf("...\n");
     return false;
 
 }
