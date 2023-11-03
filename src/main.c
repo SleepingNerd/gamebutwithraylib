@@ -35,6 +35,7 @@ int main()
 
  
     Texture2D sprite = LoadTexture("assets/sand.png");
+    Texture2D test = LoadTexture("assets/test.png");
     //SetTargetFPS(60);
 
     Vector2i tile_size = {.x = 16, .y = 16};
@@ -62,6 +63,8 @@ int main()
     BeginTextureMode(static_world);
     ClearBackground(WHITE);
     RenderWorld(world.arr, world.size);
+    DrawRectangle(110, 110, 100, 100, BLACK);
+    DrawTexture(test, 0, 0, WHITE);
     EndTextureMode;
 
 
@@ -103,9 +106,11 @@ int main()
         camera_offset.x = camera_target_x;
         camera_offset.y = camera_target_y;
 
+        // We kind of have a problem now
+        // 
 
 
-        printf("%f, %f\n", camera_offset.x, camera_target_x);
+        //printf("%f, %f\n", camera_offset.x, camera_target_x);
 
 
 
@@ -140,7 +145,7 @@ int main()
 
         BeginTextureMode(screen);
             ClearBackground(WHITE);
-            DrawTextureRec(static_world.texture, (Rectangle){.x = 0, .y = 0, .width=screenWidth, .height=-screenHeight}, (Vector2){0, 0}, WHITE);
+            DrawTextureRec(static_world.texture, (Rectangle){.x =0, .y = 0, .width=screenWidth, .height=screenHeight}, (Vector2){0, 0}, WHITE);
 
             DrawFPS(10, 10);
             //printf("%f\n", player.rect.width);

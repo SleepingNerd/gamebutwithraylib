@@ -35,10 +35,13 @@ void LoadTileTextures()
 
 void ChangeTile(Tile *world, Vector2i world_size, Vector2i position)
 {
+
     for(int y= -5; y++; y<=5)
     {
         for (int x = -5; x++; x<=5)
         {
+            printf("%i, %i\n", (position.x+x)*TILE_SIZE, (position.y+y)*TILE_SIZE);
+
             world[(position.y+y)*(world_size.x) +position.x+x].type = SAND;
             DrawRectangle((position.x+x)*TILE_SIZE,(position.y+y)*TILE_SIZE, TILE_SIZE, TILE_SIZE, BEIGE);
         }
