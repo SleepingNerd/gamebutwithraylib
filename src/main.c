@@ -63,10 +63,10 @@ int main()
     BeginTextureMode(static_world);
     ClearBackground(WHITE);
     RenderWorld(world.arr, world.size);
-    DrawRectangle(110, 110, 100, 100, BLACK);
-    DrawTexture(test, 0, 0, WHITE);
-    EndTextureMode;
+    DrawTextureRec(test, (Rectangle){.x =0, .y = 0, .width=screenWidth, .height=-screenHeight}, (Vector2){0, 0}, WHITE);
 
+    EndTextureMode();
+    
 
     while(!WindowShouldClose())
     {
@@ -93,6 +93,8 @@ int main()
         float camera_target_x = (player.rect.x - screenWidth/2-player.rect.width/2);
         float camera_target_y = (player.rect.y - screenHeight/2-player.rect.height/2);
 
+        
+
         // Normalize vector from player
         Vector2 normalized = Vector2Normalize((Vector2){.x = camera_target_x-camera_offset.x, .y = camera_target_y-camera_offset.y});
 
@@ -101,13 +103,23 @@ int main()
         //camera_offset.x += normalized.x*20*delta_t;
         //camera_offset.y += normalized.y*20*delta_t;
 
-        Vector2 prev_camera_offset = camera_offset;
+        Vector2 prev_camera_offset = {.x = (int)camera_offset.x, .y= (int)camera_offset.y};
+
         
         camera_offset.x = camera_target_x;
         camera_offset.y = camera_target_y;
 
+        Vector2i camera_moved = {.x= (int)camera_offset.x-prev_camera_offset.x, .y = camera_offset.y-prev_camera_offset.y};
+
+
+        //printf("camera: %f, %f, %i, %i ,%i\n", prev_camera_offset.x, camera_offset.x, (int)prev_camera_offset.x, (int)camera_offset.x, camera_moved.x);
+        
+        ScrollWorld(world.arr, camera_moved, static_world);
+        
+
         // We kind of have a problem now
         // 
+        
 
 
         //printf("%f, %f\n", camera_offset.x, camera_target_x);
@@ -145,7 +157,9 @@ int main()
 
         BeginTextureMode(screen);
             ClearBackground(WHITE);
-            DrawTextureRec(static_world.texture, (Rectangle){.x =0, .y = 0, .width=screenWidth, .height=screenHeight}, (Vector2){0, 0}, WHITE);
+            // I store textures with (0,0) as top-left, 
+            // This is why I have to flip the y
+            DrawTextureRec(static_world.texture, (Rectangle){.x =0, .y = 0, .width=screenWidth, .height=-screenHeight}, (Vector2){0, 0}, WHITE);
 
             DrawFPS(10, 10);
             //printf("%f\n", player.rect.width);
@@ -154,7 +168,7 @@ int main()
             player_img_rect.width= fabs(player_img_rect.width)*player.facing;
 
 
-            Vector2 offset = {.x = (int)(player.rect.x-camera_offset.x), .y= (int)(player.rect.y-camera_offset.y)};
+            Vector2 offset = {.x = (int)(player.rect.x), .y= (int)(player.rect.y)};
             DrawTextureRec(test_anim.frame_arr[anim_m_test.frame],player_img_rect, offset, BLACK);
 
             
@@ -163,11 +177,11 @@ int main()
 
         EndTextureMode();
 
+        BeginDrawing();
+
             DrawTexturePro(screen.texture, (Rectangle){.x=0, .y=0, .width=screenWidth, .height=-screenHeight}, (Rectangle){.x=0, .y=0, .width=winWidth, .height=winHeight}, (Vector2){.x = 0, .y = 0}, 0.0f, WHITE);
 
 
-        BeginDrawing();
-            
         EndDrawing();
 
 

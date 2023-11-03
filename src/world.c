@@ -40,7 +40,6 @@ void ChangeTile(Tile *world, Vector2i world_size, Vector2i position)
     {
         for (int x = -5; x++; x<=5)
         {
-            printf("%i, %i\n", (position.x+x)*TILE_SIZE, (position.y+y)*TILE_SIZE);
 
             world[(position.y+y)*(world_size.x) +position.x+x].type = SAND;
             DrawRectangle((position.x+x)*TILE_SIZE,(position.y+y)*TILE_SIZE, TILE_SIZE, TILE_SIZE, BEIGE);
@@ -63,4 +62,29 @@ void RenderWorld(Tile *world, Vector2i world_size)
 
         }
     }
+}
+
+void ScrollWorld(Tile *world, Vector2i scroll, RenderTexture2D static_world)
+{
+    if (abs(scroll.x)>=TILE_SIZE)
+    {
+        BeginTextureMode(static_world);
+        if (scroll.x < 0)
+        {
+            // WHY
+
+            
+            DrawTextureRec(static_world.texture, (Rectangle){.x= abs(scroll.x), .y=0, .width = static_world.texture.width -abs(scroll.x), .height= -static_world.texture.height}, (Vector2){.x=0, .y=0}, WHITE);
+
+        }
+        else
+        {
+            DrawTextureRec(static_world.texture, (Rectangle){.x=0, .y=0, .width = static_world.texture.width -abs(scroll.x), .height= -static_world.texture.height}, (Vector2){.x=scroll.x, .y=0}, WHITE);
+
+        }
+
+        EndTextureMode();
+        
+    }
+
 }

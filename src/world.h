@@ -28,6 +28,7 @@ typedef struct Tile{
     Color color;
 } Tile;
 
+// Should be noted that the top left of the world corresponds to arr[0][0]
 typedef struct World{
     Tile *arr;
     Vector2i size;
@@ -41,5 +42,7 @@ typedef struct World{
 void LoadTileTextures();
 void RenderWorld(Tile *world, Vector2i world_size);
 void ChangeTile(Tile *world, Vector2i world_size, Vector2i position);
+void ScrollWorld(Tile *world, Vector2i scroll, RenderTexture2D static_world);
+
 
 #endif // WORLD_H
