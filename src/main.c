@@ -97,6 +97,9 @@ int main()
         //printf("/ %f, %f\n", normalized.x, normalized.y);
         //camera_offset.x += normalized.x*20*delta_t;
         //camera_offset.y += normalized.y*20*delta_t;
+
+        Vector2 prev_camera_offset = camera_offset;
+        
         camera_offset.x = camera_target_x;
         camera_offset.y = camera_target_y;
 
@@ -146,7 +149,7 @@ int main()
             player_img_rect.width= fabs(player_img_rect.width)*player.facing;
 
 
-            Vector2 offset = {.x = (int)(player.rect.x+camera_offset.x), .y= (int)(player.rect.y-camera_offset.y)};
+            Vector2 offset = {.x = (int)(player.rect.x-camera_offset.x), .y= (int)(player.rect.y-camera_offset.y)};
             DrawTextureRec(test_anim.frame_arr[anim_m_test.frame],player_img_rect, offset, BLACK);
 
             
