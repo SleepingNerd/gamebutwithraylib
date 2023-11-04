@@ -64,27 +64,59 @@ void RenderWorld(Tile *world, Vector2i world_size)
     }
 }
 
-void ScrollWorld(Tile *world, Vector2i scroll, RenderTexture2D static_world)
+// Offset is the inworld offset, size is the size of the chunk we need
+// It is drawn on static_world, with render_coords as top left
+void RenderPartOfWorld(World world,  Vector2i offset, Vector2i size,  RenderTexture2D static_world, Vector2i render_coords)
 {
-    if (abs(scroll.x)>=TILE_SIZE)
+    int i = 0;
+    int j = 0;
+    for (int x = offset.x; x<=(offset.x+size.x); x++)
     {
-        BeginTextureMode(static_world);
-        if (scroll.x < 0)
+        for (int y = offset.y; x<=(offset.y+size.y); y++)
         {
-            // WHY
-
-            
-            DrawTextureRec(static_world.texture, (Rectangle){.x= abs(scroll.x), .y=0, .width = static_world.texture.width -abs(scroll.x), .height= -static_world.texture.height}, (Vector2){.x=0, .y=0}, WHITE);
+            if (world.arr[y*world.size.x +x].type == SAND)
+            {
+                DrawRectangle(i*TILE_SIZE+render_coords.x, j*TILE_SIZE+render_coords.y, TILE_SIZE, TILE_SIZE, BEIGE);
+            }
+            j++;
 
         }
-        else
-        {
-            DrawTextureRec(static_world.texture, (Rectangle){.x=0, .y=0, .width = static_world.texture.width -abs(scroll.x), .height= -static_world.texture.height}, (Vector2){.x=scroll.x, .y=0}, WHITE);
-
-        }
-
-        EndTextureMode();
-        
+        i++;
     }
+}
+
+
+void ScrollWorld(World world, Vector2i scroll, RenderTexture2D static_world, Vector2i camera_offset)
+{
+
+    BeginTextureMode(static_world);
+    
+ 
+
+    // Going left
+    if (scroll.x < 0)
+    {
+
+        
+        // Copy left part of the screen (x=0, width = static_world.texture.width -abs(scroll.x)) to scroll.x
+        DrawTextureRec(static_world.texture, (Rectangle){.x=0, .y=0, .width = static_world.texture.width -abs(scroll.x), .height= -static_world.texture.height}, (Vector2){.x=abs(scroll.x), .y=0}, WHITE);
+
+        RenderPartOfWorld(world, camera_offset, (Vector2i){.x = scroll.x, .y = world.size.y}, static_world, (Vector2i){.x = 0, .y=0});
+    
+
+    }
+ 
+    else if (scroll.x > 0)
+    {
+
+        DrawTextureRec(static_world.texture, (Rectangle){.x= abs(scroll.x), .y=0, .width = static_world.texture.width -abs(scroll.x), .height= -static_world.texture.height}, (Vector2){.x=0, .y=0}, WHITE);
+
+    }
+  
+
+    EndTextureMode();
+    
+    
 
 }
+

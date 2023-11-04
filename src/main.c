@@ -63,7 +63,6 @@ int main()
     BeginTextureMode(static_world);
     ClearBackground(WHITE);
     RenderWorld(world.arr, world.size);
-    DrawTextureRec(test, (Rectangle){.x =0, .y = 0, .width=screenWidth, .height=-screenHeight}, (Vector2){0, 0}, WHITE);
 
     EndTextureMode();
     
@@ -90,6 +89,9 @@ int main()
         // Player_pos = 
         //
 
+
+        // Target is calculated based on player position and where he should be on the screen
+        //
         float camera_target_x = (player.rect.x - screenWidth/2-player.rect.width/2);
         float camera_target_y = (player.rect.y - screenHeight/2-player.rect.height/2);
 
@@ -109,8 +111,7 @@ int main()
         camera_offset.x = camera_target_x;
         camera_offset.y = camera_target_y;
 
-        Vector2i camera_moved = {.x= (int)camera_offset.x-prev_camera_offset.x, .y = camera_offset.y-prev_camera_offset.y};
-
+        Vector2i camera_moved = {.x= (int)(camera_offset.x-prev_camera_offset.x), .y = camera_offset.y-prev_camera_offset.y};
 
         //printf("camera: %f, %f, %i, %i ,%i\n", prev_camera_offset.x, camera_offset.x, (int)prev_camera_offset.x, (int)camera_offset.x, camera_moved.x);
         
@@ -168,7 +169,7 @@ int main()
             player_img_rect.width= fabs(player_img_rect.width)*player.facing;
 
 
-            Vector2 offset = {.x = (int)(player.rect.x), .y= (int)(player.rect.y)};
+            Vector2 offset = {.x = (int)(player.rect.x-camera_offset.x), .y= (int)(player.rect.y-camera_offset.y)};
             DrawTextureRec(test_anim.frame_arr[anim_m_test.frame],player_img_rect, offset, BLACK);
 
             

@@ -42,7 +42,7 @@ typedef struct World{
 void LoadTileTextures();
 void RenderWorld(Tile *world, Vector2i world_size);
 void ChangeTile(Tile *world, Vector2i world_size, Vector2i position);
-void ScrollWorld(Tile *world, Vector2i scroll, RenderTexture2D static_world);
+void ScrollWorld(World world, Vector2i scroll, RenderTexture2D static_world, Vector2i camera_offset);
 
 
 #endif // WORLD_H

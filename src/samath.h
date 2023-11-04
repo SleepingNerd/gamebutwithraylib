@@ -6,6 +6,13 @@ typedef struct Vector2i {
     int y;
 } Vector2i;
 
+typedef struct Recti {
+    int x;
+    int y;
+    int width;
+    int height;
+} Recti;
+
 int floor_to_muiltiple(int x, int m);
 int ceiling_to_muiltiple(int x, int m);
 
