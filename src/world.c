@@ -106,11 +106,14 @@ void ScrollWorld(World world, Vector2i scroll, RenderTexture2D static_world, Vec
 
     }
  
+    // Going right
     else if (scroll.x > 0)
     {
-
+        // Draw scroll.x -> width-scroll.x to 0-> width-scroll.x
         DrawTextureRec(static_world.texture, (Rectangle){.x= abs(scroll.x), .y=0, .width = static_world.texture.width -abs(scroll.x), .height= -static_world.texture.height}, (Vector2){.x=0, .y=0}, WHITE);
-
+        //DrawRectangleRec((Rectangle){.x= abs(scroll.x), .y=0, .width = static_world.texture.width -abs(scroll.x), .height= static_world.texture.height}, RED);
+        //DrawRectangleRec((Rectangle){.x= static_world.texture.width- abs(scroll.x), .y=0, .width = static_world.texture.width -abs(scroll.x), .height= static_world.texture.height}, BLUE);
+        RenderPartOfWorld(world, (Vector2i){camera_offset.x+(static_world.texture.width -abs(scroll.x)), 0}, (Vector2i){.x = camera_offset.x - abs(scroll.x), .y = 0}, static_world, (Vector2i){.x = static_world.texture.width- abs(scroll.x) ,.y= 0});
     }
   
 

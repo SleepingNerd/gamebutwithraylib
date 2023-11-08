@@ -40,8 +40,8 @@ int main()
 
     Vector2i tile_size = {.x = 16, .y = 16};
     World world;
-    world.size.x = (screenWidth/TILE_SIZE);
-    world.size.y = (screenHeight/TILE_SIZE);
+    world.size.x = (screenWidth/TILE_SIZE)*2;
+    world.size.y = (screenHeight/TILE_SIZE)*2;
     world.arr = calloc(world.size.x*world.size.y, sizeof(Tile));
 
     Animation test_anim = LoadAnimation("assets/player/player.png", 5, 0.3f);
@@ -105,7 +105,7 @@ int main()
         //camera_offset.x += normalized.x*20*delta_t;
         //camera_offset.y += normalized.y*20*delta_t;
 
-        Vector2 prev_camera_offset = {.x = (int)camera_offset.x, .y= (int)camera_offset.y};
+        Vector2i prev_camera_offset = {.x = (int)camera_offset.x, .y= (int)camera_offset.y};
 
         
         camera_offset.x = camera_target_x;
@@ -114,8 +114,8 @@ int main()
         Vector2i camera_moved = {.x= (int)(camera_offset.x-prev_camera_offset.x), .y = camera_offset.y-prev_camera_offset.y};
 
         //printf("camera: %f, %f, %i, %i ,%i\n", prev_camera_offset.x, camera_offset.x, (int)prev_camera_offset.x, (int)camera_offset.x, camera_moved.x);
-        
-        ScrollWorld(world.arr, camera_moved, static_world);
+        printf("%f, %i\n", camera_offset.x, camera_moved.x);
+        ScrollWorld(world, camera_moved, static_world, prev_camera_offset);
         
 
         // We kind of have a problem now
