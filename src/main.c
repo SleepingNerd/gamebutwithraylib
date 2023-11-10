@@ -8,6 +8,7 @@
 #include "world.h"
 #include "sanimation.h"
 #include "player.h"
+#include "camera.h"
 
 #define MOUSE_OVERLAY (Color){ 211, 176, 131, 100 }   
 
@@ -43,6 +44,9 @@ int main()
     world.size.x = (screenWidth/TILE_SIZE)*2;
     world.size.y = (screenHeight/TILE_SIZE)*2;
     world.arr = calloc(world.size.x*world.size.y, sizeof(Tile));
+
+
+    Camera camera = {0};
 
     Animation test_anim = LoadAnimation("assets/player/player.png", 5, 0.3f);
     AnimationManager anim_m_test = {.frame = 0, .delta = 0};
@@ -92,6 +96,7 @@ int main()
 
         // Target is calculated based on player position and where he should be on the screen
         //
+
         float camera_target_x = (player.rect.x - screenWidth/2-player.rect.width/2);
         float camera_target_y = (player.rect.y - screenHeight/2-player.rect.height/2);
 
@@ -115,6 +120,8 @@ int main()
 
         //printf("camera: %f, %f, %i, %i ,%i\n", prev_camera_offset.x, camera_offset.x, (int)prev_camera_offset.x, (int)camera_offset.x, camera_moved.x);
         //printf("%f, %i\n", camera_offset.x, camera_moved.x);
+
+        // Moves camera by
         ScrollWorld(world, camera_moved, static_world, prev_camera_offset);
         
 

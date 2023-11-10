@@ -32,6 +32,7 @@ typedef struct Tile{
 typedef struct World{
     Tile *arr;
     Vector2i size;
+    RenderTexture2D static_world;
 } World;
 
 

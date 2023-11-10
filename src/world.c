@@ -101,7 +101,7 @@ void RenderPartOfWorld(World world,  Vector2i offset, Vector2i size,  RenderText
 }
 
 // Also applies the scoll
-void ScrollWorld(World world, Vector2i scroll, RenderTexture2D static_world, Vector2i camera_offset)
+void ScrollWorld(World world, Camera camera, RenderTexture2D static_world, Vector2i camera_offset, Vector2 scoll)
 {
 
     BeginTextureMode(static_world);
