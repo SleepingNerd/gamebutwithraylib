@@ -114,7 +114,7 @@ int main()
         Vector2i camera_moved = {.x= (int)(camera_offset.x-prev_camera_offset.x), .y = camera_offset.y-prev_camera_offset.y};
 
         //printf("camera: %f, %f, %i, %i ,%i\n", prev_camera_offset.x, camera_offset.x, (int)prev_camera_offset.x, (int)camera_offset.x, camera_moved.x);
-        printf("%f, %i\n", camera_offset.x, camera_moved.x);
+        //printf("%f, %i\n", camera_offset.x, camera_moved.x);
         ScrollWorld(world, camera_moved, static_world, prev_camera_offset);
         
 

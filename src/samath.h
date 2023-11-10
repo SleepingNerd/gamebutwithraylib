@@ -6,6 +6,10 @@ typedef struct Vector2i {
     int y;
 } Vector2i;
 
+typedef Vector2i Vect2i;
+
+
+
 typedef struct Recti {
     int x;
     int y;

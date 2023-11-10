@@ -35,6 +35,10 @@ void LoadTileTextures()
 
 void ChangeTile(Tile *world, Vector2i world_size, Vector2i position)
 {
+    if (position.x > world_size.x)
+    {
+        return;
+    }
 
     for(int y= -5; y++; y<=5)
     {
@@ -42,7 +46,10 @@ void ChangeTile(Tile *world, Vector2i world_size, Vector2i position)
         {
 
             world[(position.y+y)*(world_size.x) +position.x+x].type = SAND;
+
+     
             DrawRectangle((position.x+x)*TILE_SIZE,(position.y+y)*TILE_SIZE, TILE_SIZE, TILE_SIZE, BEIGE);
+
         }
     }
 
@@ -68,15 +75,23 @@ void RenderWorld(Tile *world, Vector2i world_size)
 // It is drawn on static_world, with render_coords as top left
 void RenderPartOfWorld(World world,  Vector2i offset, Vector2i size,  RenderTexture2D static_world, Vector2i render_coords)
 {
-    int i = 0;
-    int j = 0;
+
+    printf("%i, %i\n", offset.x, offset.y);
+    printf("%i, %i\n", size.x, size.y);
+    printf("%i, %i\n", offset.x, offset.y);
+    printf("...\n");
+
+    int i = render_coords.x;
+    int j = render_coords.y;
+    
     for (int x = offset.x; x<=(offset.x+size.x); x++)
     {
+    
         for (int y = offset.y; x<=(offset.y+size.y); y++)
         {
             if (world.arr[y*world.size.x +x].type == SAND)
             {
-                DrawRectangle(i*TILE_SIZE+render_coords.x, j*TILE_SIZE+render_coords.y, TILE_SIZE, TILE_SIZE, BEIGE);
+                DrawRectangle(i*TILE_SIZE, j*TILE_SIZE, TILE_SIZE, TILE_SIZE, BEIGE);
             }
             j++;
 
@@ -85,7 +100,7 @@ void RenderPartOfWorld(World world,  Vector2i offset, Vector2i size,  RenderText
     }
 }
 
-
+// Also applies the scoll
 void ScrollWorld(World world, Vector2i scroll, RenderTexture2D static_world, Vector2i camera_offset)
 {
 
