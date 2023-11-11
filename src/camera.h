@@ -6,7 +6,7 @@
 #define CAMERA_H
 
 //
-typedef struct Camera {
+typedef struct Vieuw {
     Vector2 offset;    // Left top
     Vector2i p_offset; // Left top index position
 

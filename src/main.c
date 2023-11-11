@@ -31,7 +31,7 @@ int main()
     RenderTexture2D static_world = LoadRenderTexture(screenWidth, screenHeight);
 
 
-    Vector2 camera_offset = {.x = 0, .y =0};
+
     //Vector2 camera_middle = {.x = 0, .y = 0};
 
  
