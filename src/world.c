@@ -48,7 +48,7 @@ void ChangeTile(Tile *world, Vector2i world_size, Vector2i position)
             world[(position.y+y)*(world_size.x) +position.x+x].type = SAND;
 
      
-            DrawRectangle((position.x+x)*TILE_SIZE,(position.y+y)*TILE_SIZE, TILE_SIZE, TILE_SIZE, BEIGE);
+            DrawPixel((position.x+x)*TILE_SIZE,(position.y+y)*TILE_SIZE, BEIGE);
 
         }
     }
@@ -63,7 +63,7 @@ void RenderWorld(Tile *world, Vector2i world_size)
         {
             if (world[y*world_size.x +x].type == SAND)
             {
-                DrawRectangle(x*TILE_SIZE,y*TILE_SIZE, TILE_SIZE, TILE_SIZE, BEIGE);
+                DrawPixel(x, y, BEIGE);
                 //DrawTexture(textures[world[y*world_size.x +x].type-1],x*TILE_SIZE,y*TILE_SIZE, WHITE);
             }
 
@@ -105,7 +105,7 @@ void ScrollWorld(World world, Camera camera, RenderTexture2D static_world, Vecto
 {
 
     BeginTextureMode(static_world);
-    
+    /*
  
 
     // Going left
@@ -130,7 +130,7 @@ void ScrollWorld(World world, Camera camera, RenderTexture2D static_world, Vecto
         //DrawRectangleRec((Rectangle){.x= static_world.texture.width- abs(scroll.x), .y=0, .width = static_world.texture.width -abs(scroll.x), .height= static_world.texture.height}, BLUE);
         RenderPartOfWorld(world, (Vector2i){camera_offset.x+(static_world.texture.width -abs(scroll.x)), 0}, (Vector2i){.x = camera_offset.x - abs(scroll.x), .y = 0}, static_world, (Vector2i){.x = static_world.texture.width- abs(scroll.x) ,.y= 0});
     }
-  
+    */
 
     EndTextureMode();
     

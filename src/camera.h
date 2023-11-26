@@ -11,7 +11,7 @@ typedef struct Vieuw {
     Vector2i p_offset; // Left top index position
 
 
-} Camera;
+} Vieuw;
 
 
 
