@@ -6,12 +6,12 @@
 #define CAMERA_H
 
 //
-typedef struct Vieuw {
+typedef struct View {
     Vector2 offset;    // Left top
     Vector2i p_offset; // Left top index position
+} View;
 
-
-} Vieuw;
+int Scroll(View *camera, float scroll_x,  float scroll_y);
 
 
 

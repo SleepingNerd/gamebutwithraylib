@@ -4,7 +4,7 @@ INCLUDE = ../include/
 LIBS = ../lib/
 OBJ = $(wildcard *.o)
 CC = gcc
-CFILES = ./main.c ./world.c ./samath.c ./sanimation.c ./player.c
+CFILES = ./main.c ./world.c ./samath.c ./sanimation.c ./player.c ./camera.c
 OFILES = $(patsubst %.c,%.o, $(CFILES))
 
 build: $(OFILES)

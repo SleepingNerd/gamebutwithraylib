@@ -41,12 +41,19 @@ int main()
 
     Vector2i tile_size = {.x = 16, .y = 16};
     World world;
-    world.size.x = (screenWidth/TILE_SIZE)*2;
-    world.size.y = (screenHeight/TILE_SIZE)*2;
-    world.arr = calloc(world.size.x*world.size.y, sizeof(Tile));
+    world.size.x = (screenWidth/TILE_SIZE)*10;
+    world.size.y = (screenHeight/TILE_SIZE)*10;
+    world.tiles = calloc(world.size.x*world.size.y, sizeof(TileState));
+    world.colors = calloc(world.size.x*world.size.y, sizeof(Color));
+
+    Image static_world_img = {.data = world.colors, .format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8, .height = world.size.y, .width = world.size.x, .mipmaps = 1};
+    
 
 
-    Vieuw camera = {0};
+
+
+
+    View camera = {0};
 
     Animation test_anim = LoadAnimation("assets/player/player.png", 5, 0.3f);
     AnimationManager anim_m_test = {.frame = 0, .delta = 0};
@@ -66,7 +73,7 @@ int main()
 
     BeginTextureMode(static_world);
     ClearBackground(WHITE);
-    RenderWorld(world.arr, world.size);
+    RenderWorld(world, world.size);
 
     EndTextureMode();
     
@@ -86,46 +93,20 @@ int main()
 
         
         ProcessInput(&player, IsKeyDown(KEY_LEFT), IsKeyDown(KEY_RIGHT), IsKeyDown(KEY_UP));
+
+        Vector2 prev_player_pos = {.x = player.rect.x, .y =player.rect.y};
         MoveAndUpdate(&player, GetFrameTime(), world);
+        Vector2 scroll ={.x = player.rect.x-prev_player_pos.x, .y =player.rect.y-prev_player_pos.y};
 
-        // Player should always be in the middle of the screen, therefore
-        // For these calculations to be accurate the player size should be divisible by 2
-        // Player_pos = 
-        //
+        Scroll(&camera, scroll.x, scroll.y);
 
-
-        // Target is calculated based on player position and where he should be on the screen
-        //
-
-        float camera_target_x = (player.rect.x - screenWidth/2-player.rect.width/2);
-        float camera_target_y = (player.rect.y - screenHeight/2-player.rect.height/2);
-
-        
-
-
-        //printf("camera: %f, %f, %i, %i ,%i\n", prev_camera_offset.x, camera_offset.x, (int)prev_camera_offset.x, (int)camera_offset.x, camera_moved.x);
-        //printf("%f, %i\n", camera_offset.x, camera_moved.x);
-
-        // Moves camera by
-        
-
-        // We kind of have a problem now
-        // 
-        
-
-
-        //printf("%f, %f\n", camera_offset.x, camera_target_x);
-
-
-
-
-        Vector2i selected_tile = {.x= floor_to_muiltiple(GetMousePosition().x/winWidth*screenWidth, TILE_SIZE), .y=floor_to_muiltiple(GetMousePosition().y/winHeight*screenHeight, TILE_SIZE)};
+        Vector2i selected_tile = {.x= floor_to_muiltiple((GetMousePosition().x+camera.offset.x)/winWidth*screenWidth, TILE_SIZE), .y=floor_to_muiltiple((GetMousePosition().y+camera.offset.y)/winHeight*screenHeight, TILE_SIZE)};
         Vector2i selected_tile_index =  {.x= selected_tile.x/TILE_SIZE, .y=selected_tile.y /TILE_SIZE};
 
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
         {
             BeginTextureMode(static_world);
-            ChangeTile(world.arr, world.size, selected_tile_index);
+            ChangeTile(world, world.size, selected_tile_index);
             EndTextureMode();
         }
         
@@ -146,12 +127,17 @@ int main()
             }
         }
     
-
         BeginTextureMode(screen);
             ClearBackground(WHITE);
             // I store textures with (0,0) as top-left, 
             // This is why I have to flip the y
-            DrawTextureRec(static_world.texture, (Rectangle){.x =0, .y = 0, .width=screenWidth, .height=-screenHeight}, (Vector2){0, 0}, WHITE);
+
+            Image img_slice = ImageFromImage(static_world_img, (Rectangle){.x =(int)camera.offset.x, .y = (int)camera.offset.y, .width=screenWidth, .height= screenHeight});
+            Texture text = LoadTextureFromImage(img_slice);
+
+            DrawTextureRec(text, (Rectangle){.x =0, .y =0, .width=screenWidth, .height= screenHeight}, (Vector2){0, 0}, WHITE);
+
+
 
             DrawFPS(10, 10);
             //printf("%f\n", player.rect.width);
@@ -160,10 +146,9 @@ int main()
             player_img_rect.width= fabs(player_img_rect.width)*player.facing;
 
 
-            Vector2 offset = {.x = (int)(player.rect.x), .y= (int)(player.rect.y)};
-            DrawTextureRec(test_anim.frame_arr[anim_m_test.frame],player_img_rect, offset, BLACK);
+            Vector2 offset = {.x = (int)(player.rect.x)-(int)camera.offset.x, .y= (int)(player.rect.y)-(int)camera.offset.y};
 
-            
+            DrawTextureRec(test_anim.frame_arr[anim_m_test.frame],player_img_rect, offset, BLACK);
             
 
 
@@ -179,7 +164,7 @@ int main()
 
 
     }
-    free(world.arr);
+    free(world.tiles);
     CloseWindow();
     return 0;
 }

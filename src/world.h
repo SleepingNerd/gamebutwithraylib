@@ -16,9 +16,9 @@
 extern char* texture_names[TILES];
 extern Texture2D textures[TILES];
 
-
+//PIXELFORMAT_UNCOMPRESSED_R8G8B8A8
 typedef enum {
-    VOID = 0,
+    VOID =  0,
     SOLID = 1,
     FLUID = 2,
     GAS = 3
@@ -31,26 +31,29 @@ typedef struct Tile{
     Color color;
 } Tile;
 
+
+
 // Should be noted that the top left of the world corresponds to arr[0][0]
+// arr and color should be the same size
 typedef struct World{
-    Tile *arr;
+    TileState *tiles;
+    Color *colors;
     Vector2i size;
 } World;
 
 // All tiles
-Tile SAND = {.type = SOLID, .color = {.r = 100, .b = 100, .g = 100, .a = 255}};
-Tile EMPTY = {.type = VOID, .color = {.r = 100, .b = 100, .g = 100, .a = 0}};
 
 
 
+//PIXELFORMAT_UNCOMPRESSED_R8G8B8A8
 
 
 
 // World_size is accessed like this World_size[y][x]
 void LoadTileTextures();
-void RenderWorld(Tile *world, Vector2i world_size);
-void ChangeTile(Tile *world, Vector2i world_size, Vector2i position);
-void ScrollWorld(World world, Camera camera, RenderTexture2D static_world, Vector2 scoll)
+void RenderWorld(World world, Vector2i world_size);
+void ChangeTile(World world, Vector2i world_size, Vector2i position);
+void ScrollWorld(World world, Camera camera, RenderTexture2D static_world, Vector2 scoll);
 
 
 #endif // WORLD_H

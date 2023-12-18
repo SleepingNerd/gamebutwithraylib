@@ -5,8 +5,8 @@
 
 #include "samath.h"
 #include "world.h"
-
-char* texture_names[TILES] = {"sand"};
+//
+char* texture_names[TILES] = {"SOLID"};
 Texture2D textures[TILES] = {0};
 
 void LoadTileTextures()
@@ -33,7 +33,7 @@ void LoadTileTextures()
     }
 }
 
-void ChangeTile(Tile *world, Vector2i world_size, Vector2i position)
+void ChangeTile(World world, Vector2i world_size, Vector2i position)
 {
     if (position.x > world_size.x)
     {
@@ -45,26 +45,25 @@ void ChangeTile(Tile *world, Vector2i world_size, Vector2i position)
         for (int x = -5; x++; x<=5)
         {
 
-            world[(position.y+y)*(world_size.x) +position.x+x].type = SAND;
+            world.tiles[(position.y+y)*(world_size.x) +position.x+x] = SOLID;
+            world.colors[(position.y+y)*(world_size.x) +position.x+x] = BEIGE;
 
      
-            DrawPixel((position.x+x)*TILE_SIZE,(position.y+y)*TILE_SIZE, BEIGE);
-
         }
     }
 
 }
 
-void RenderWorld(Tile *world, Vector2i world_size)
+void RenderWorld(World world, Vector2i world_size)
 {
     for (int x = 0; x<world_size.x; x++)
     {
         for (int y = 0; y<world_size.y; y ++)
         {
-            if (world[y*world_size.x +x].type == SAND)
+            if (world.tiles[y*world_size.x +x] == SOLID)
             {
                 DrawPixel(x, y, BEIGE);
-                //DrawTexture(textures[world[y*world_size.x +x].type-1],x*TILE_SIZE,y*TILE_SIZE, WHITE);
+                //DrawTexture(textures[world[y*world_size.x +x]-1],x*TILE_SIZE,y*TILE_SIZE, WHITE);
             }
 
         }
@@ -89,7 +88,7 @@ void RenderPartOfWorld(World world,  Vector2i offset, Vector2i size,  RenderText
     
         for (int y = offset.y; x<=(offset.y+size.y); y++)
         {
-            if (world.arr[y*world.size.x +x].type == SAND)
+            if (world.tiles[y*world.size.x +x] == SOLID)
             {
                 DrawRectangle(i*TILE_SIZE, j*TILE_SIZE, TILE_SIZE, TILE_SIZE, BEIGE);
             }

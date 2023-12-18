@@ -45,7 +45,7 @@ bool Collision(Player *player, World world, int left_tile, int right_tile, int t
         
         for (int y = top_tile; y<=bottom_tile; y++)
         {
-            if (world.arr[(x)+(y *world.size.x)].type == SAND)
+            if (world.tiles[(x)+(y *world.size.x)] == SOLID)
             {
                 return true;
             }
@@ -66,7 +66,7 @@ bool DownCollision(Player *player, World world, int left_tile, int right_tile)
         for(int i = left_tile; i<=right_tile; i++)
         {
             // Apply setback if moved into tile
-            if (world.arr[(i)+(bottom_tile *world.size.x)].type == SAND)
+            if (world.tiles[(i)+(bottom_tile *world.size.x)] == SOLID)
             {
                 player->rect.y = (bottom_tile)*TILE_SIZE-player->rect.height;
                 return true;
@@ -86,7 +86,7 @@ bool UpCollision(Player *player, World world, int left_tile, int right_tile)
     for(int i = left_tile; i<=right_tile; i++)
     {
         // Apply setback if moved into tile
-        if (world.arr[(i)+(top_tile *world.size.x)].type == SAND)
+        if (world.tiles[(i)+(top_tile *world.size.x)] == SOLID)
         {
             player->rect.y = (top_tile+1)*TILE_SIZE;
             return true;
@@ -105,7 +105,7 @@ bool RightCollision(Player *player, World world, int top_tile, int bottom_tile)
 
         for(int i = top_tile; i<= bottom_tile; i++)
         {
-            if (world.arr[(right_tile)+(i *world.size.x)].type == SAND)
+            if (world.tiles[(right_tile)+(i *world.size.x)] == SOLID)
             {
                 
                 float original_y = player->rect.y;
@@ -142,7 +142,7 @@ bool RightCollision(Player *player, World world, int top_tile, int bottom_tile)
                         for(int y = top_tile-1; y>=new_top_tile; y--)
                         {
 
-                            if (world.arr[(x)+(y *world.size.x)].type == SAND)
+                            if (world.tiles[(x)+(y *world.size.x)] == SOLID)
                             {
                                 player->rect.x = right_tile*TILE_SIZE-player->rect.width;
                                 return true;
@@ -165,7 +165,7 @@ bool LeftCollision(Player *player, World world, int top_tile, int bottom_tile)
     int left_tile = (player->rect.x)/TILE_SIZE;
     for(int i = top_tile; i<= bottom_tile; i++)
     {
-        if (world.arr[(left_tile)+(i *world.size.x)].type == SAND)
+        if (world.tiles[(left_tile)+(i *world.size.x)] == SOLID)
         {
             
              // How many tiles the player would slide up 
@@ -192,7 +192,7 @@ bool LeftCollision(Player *player, World world, int top_tile, int bottom_tile)
                     for(int y = top_tile-1; y>=new_top_tile; y--)
                     {
 
-                        if (world.arr[(x)+(y *world.size.x)].type == SAND)
+                        if (world.tiles[(x)+(y *world.size.x)] == SOLID)
                         {
                             player->rect.x = (left_tile+1)*TILE_SIZE;
                             return true;
