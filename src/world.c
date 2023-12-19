@@ -69,9 +69,9 @@ void RenderWorld(World world, Vector2i world_size)
     }
 }
 
-void SaveWorld(World world, char * file_name
+void SaveWorld(World world, char * file_name)
 {
-    FILE *fptr = fopen("c:/")
+    printf("frick");
 }
 
 // Offset is the inworld offset, size is the size of the chunk we need

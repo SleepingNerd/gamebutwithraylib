@@ -87,7 +87,7 @@ int main()
 
     EndTextureMode();
     
-
+    Image img_slice;
     while(!WindowShouldClose())
     {
 
@@ -140,10 +140,14 @@ int main()
             }
         }
 
-        Image img_slice = ImageFromImage(static_world_img, (Rectangle){.x =(int)camera.offset.x, .y = (int)camera.offset.y, .width=screenWidth, .height= screenHeight});
+        img_slice = ImageFromImage(static_world_img, (Rectangle){.x =(int)camera.offset.x, .y = (int)camera.offset.y, .width=screenWidth, .height= screenHeight});
         ImageFlipVertical(&img_slice);
-        UpdateTexture(screen.texture, img_slice.data);   
+        ImageBlurGaussian(&img_slice, 1);
+        ImageDither(&img_slice, 1, 2, 3, 4);
 
+        UpdateTexture(screen.texture, img_slice.data);   
+        UnloadImage(img_slice);
+        
         BeginTextureMode(screen);
             //ClearBackground(WHITE);
             // I store textures with (0,0) as top-left, 
