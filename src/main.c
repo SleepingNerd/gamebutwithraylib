@@ -43,8 +43,9 @@ int main()
     World world;
     world.size.x = (screenWidth/TILE_SIZE)*10;
     world.size.y = (screenHeight/TILE_SIZE)*10;
-    world.tiles = calloc(world.size.x*world.size.y, sizeof(TileState));
-    world.colors = calloc(world.size.x*world.size.y, sizeof(Color));
+    EmptyWorld(&world);
+
+
 
     Image static_world_img = {.data = world.colors, .format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8, .height = world.size.y, .width = world.size.x, .mipmaps = 1};
     
@@ -64,6 +65,15 @@ int main()
 
     CalculateSize(&player, 8, 15);
     
+
+    Color *image = calloc(4, sizeof(Color));
+    image[0] = RED;
+    image[1] = BLUE;
+    image[2] = GREEN;
+    image[3] = GRAY;
+
+    Image test_img = {.data = image, .format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8, .height = 2, .width = 2, .mipmaps = 1};
+
 
 
     Rectangle player_img_rect = {.height=16, .width=8,.x=0,.y=0};
@@ -100,7 +110,10 @@ int main()
 
         Scroll(&camera, scroll.x, scroll.y);
 
-        Vector2i selected_tile = {.x= floor_to_muiltiple((GetMousePosition().x+camera.offset.x)/winWidth*screenWidth, TILE_SIZE), .y=floor_to_muiltiple((GetMousePosition().y+camera.offset.y)/winHeight*screenHeight, TILE_SIZE)};
+
+        Vector2i selected_tile = {.x= floor_to_muiltiple((GetMousePosition().x)/winWidth*screenWidth+camera.offset.x, TILE_SIZE), .y=floor_to_muiltiple((GetMousePosition().y)/winHeight*screenHeight+camera.offset.y, TILE_SIZE) };
+       
+       
         Vector2i selected_tile_index =  {.x= selected_tile.x/TILE_SIZE, .y=selected_tile.y /TILE_SIZE};
 
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
@@ -126,16 +139,16 @@ int main()
                 winHeight = screenHeight;
             }
         }
-    
+
+        Image img_slice = ImageFromImage(static_world_img, (Rectangle){.x =(int)camera.offset.x, .y = (int)camera.offset.y, .width=screenWidth, .height= screenHeight});
+        ImageFlipVertical(&img_slice);
+        UpdateTexture(screen.texture, img_slice.data);   
+
         BeginTextureMode(screen);
-            ClearBackground(WHITE);
+            //ClearBackground(WHITE);
             // I store textures with (0,0) as top-left, 
             // This is why I have to flip the y
 
-            Image img_slice = ImageFromImage(static_world_img, (Rectangle){.x =(int)camera.offset.x, .y = (int)camera.offset.y, .width=screenWidth, .height= screenHeight});
-            Texture text = LoadTextureFromImage(img_slice);
-
-            DrawTextureRec(text, (Rectangle){.x =0, .y =0, .width=screenWidth, .height= screenHeight}, (Vector2){0, 0}, WHITE);
 
 
 
@@ -148,6 +161,7 @@ int main()
 
             Vector2 offset = {.x = (int)(player.rect.x)-(int)camera.offset.x, .y= (int)(player.rect.y)-(int)camera.offset.y};
 
+
             DrawTextureRec(test_anim.frame_arr[anim_m_test.frame],player_img_rect, offset, BLACK);
             
 
@@ -157,7 +171,6 @@ int main()
         BeginDrawing();
 
             DrawTexturePro(screen.texture, (Rectangle){.x=0, .y=0, .width=screenWidth, .height=-screenHeight}, (Rectangle){.x=0, .y=0, .width=winWidth, .height=winHeight}, (Vector2){.x = 0, .y = 0}, 0.0f, WHITE);
-
 
         EndDrawing();
 

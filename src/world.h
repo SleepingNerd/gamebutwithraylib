@@ -55,5 +55,9 @@ void RenderWorld(World world, Vector2i world_size);
 void ChangeTile(World world, Vector2i world_size, Vector2i position);
 void ScrollWorld(World world, Camera camera, RenderTexture2D static_world, Vector2 scoll);
 
+// Allocates and creates an empty world
+void EmptyWorld(World *world);
+
+
 
 #endif // WORLD_H

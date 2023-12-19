@@ -65,9 +65,13 @@ void RenderWorld(World world, Vector2i world_size)
                 DrawPixel(x, y, BEIGE);
                 //DrawTexture(textures[world[y*world_size.x +x]-1],x*TILE_SIZE,y*TILE_SIZE, WHITE);
             }
-
         }
     }
+}
+
+void SaveWorld(World world, char * file_name
+{
+    FILE *fptr = fopen("c:/")
 }
 
 // Offset is the inworld offset, size is the size of the chunk we need
@@ -99,41 +103,19 @@ void RenderPartOfWorld(World world,  Vector2i offset, Vector2i size,  RenderText
     }
 }
 
-// Also applies the scoll
-void ScrollWorld(World world, Camera camera, RenderTexture2D static_world, Vector2 scoll)
+void EmptyWorld(World *world)
 {
+    unsigned int total_elements = world->size.x*world->size.y;
 
-    BeginTextureMode(static_world);
-    /*
- 
+    world->tiles = calloc(total_elements, sizeof(TileState));
+    world->colors = calloc(total_elements, sizeof(Color));
 
-    // Going left
-    if (scroll.x < 0)
+
+    for (unsigned int i = 0; i<total_elements; i++)
     {
-
-        
-        // Copy left part of the screen (x=0, width = static_world.texture.width -abs(scroll.x)) to scroll.x
-        DrawTextureRec(static_world.texture, (Rectangle){.x=0, .y=0, .width = static_world.texture.width -abs(scroll.x), .height= -static_world.texture.height}, (Vector2){.x=abs(scroll.x), .y=0}, WHITE);
-
-        RenderPartOfWorld(world, camera_offset, (Vector2i){.x = scroll.x, .y = world.size.y}, static_world, (Vector2i){.x = 0, .y=0});
-    
-
+        world->tiles[i] = VOID;
+        world->colors[i] = WHITE;
     }
- 
-    // Going right
-    else if (scroll.x > 0)
-    {
-        // Draw scroll.x -> width-scroll.x to 0-> width-scroll.x
-        DrawTextureRec(static_world.texture, (Rectangle){.x= abs(scroll.x), .y=0, .width = static_world.texture.width -abs(scroll.x), .height= -static_world.texture.height}, (Vector2){.x=0, .y=0}, WHITE);
-        //DrawRectangleRec((Rectangle){.x= abs(scroll.x), .y=0, .width = static_world.texture.width -abs(scroll.x), .height= static_world.texture.height}, RED);
-        //DrawRectangleRec((Rectangle){.x= static_world.texture.width- abs(scroll.x), .y=0, .width = static_world.texture.width -abs(scroll.x), .height= static_world.texture.height}, BLUE);
-        RenderPartOfWorld(world, (Vector2i){camera_offset.x+(static_world.texture.width -abs(scroll.x)), 0}, (Vector2i){.x = camera_offset.x - abs(scroll.x), .y = 0}, static_world, (Vector2i){.x = static_world.texture.width- abs(scroll.x) ,.y= 0});
-    }
-    */
-
-    EndTextureMode();
-    
-    
-
 }
+
 
