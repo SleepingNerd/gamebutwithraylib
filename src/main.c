@@ -142,8 +142,7 @@ int main()
 
         img_slice = ImageFromImage(static_world_img, (Rectangle){.x =(int)camera.offset.x, .y = (int)camera.offset.y, .width=screenWidth, .height= screenHeight});
         ImageFlipVertical(&img_slice);
-        ImageBlurGaussian(&img_slice, 1);
-        ImageDither(&img_slice, 1, 2, 3, 4);
+
 
         UpdateTexture(screen.texture, img_slice.data);   
         UnloadImage(img_slice);
@@ -181,7 +180,12 @@ int main()
 
 
     }
+
+    SaveWorld(world, "worlds/world.saworld");
+
     free(world.tiles);
+    free(world.colors);
+
     CloseWindow();
     return 0;
 }

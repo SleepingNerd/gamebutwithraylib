@@ -58,6 +58,10 @@ void ScrollWorld(World world, Camera camera, RenderTexture2D static_world, Vecto
 // Allocates and creates an empty world
 void EmptyWorld(World *world);
 
+// io
+void SaveWorld(World world, char *path);
+
+
 
 
 #endif // WORLD_H
