@@ -31,14 +31,19 @@ typedef struct Tile{
     Color color;
 } Tile;
 
+typedef struct Chunk{
+    
+
+    TileState *tiles;
+    Color *colors;
+    Vector2i size;
+} Chunk;
 
 
 // Should be noted that the top left of the world corresponds to arr[0][0]
 // arr and color should be the same size
 typedef struct World{
-    TileState *tiles;
-    Color *colors;
-    Vector2i size;
+    Chunk *chunks;
 } World;
 
 // All tiles

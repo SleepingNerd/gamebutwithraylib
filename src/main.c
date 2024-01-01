@@ -17,13 +17,13 @@
 
 int main()
 {
-    int winWidth = 512;
-    int winHeight = 288;
+    int winWidth = 640;
+    int winHeight = 360;
 
     InitWindow(winWidth, winHeight, "Best game I've ever seen");
     
-    int screenWidth = 512;
-    int screenHeight = 288;
+    int screenWidth = 640;
+    int screenHeight = 360;
 
 
     SetWindowMinSize(screenWidth, screenHeight);
@@ -60,7 +60,7 @@ int main()
     AnimationManager anim_m_test = {.frame = 0, .delta = 0};
     LoadTileTextures();
 
-    Player player = {.speed=50, .rect = {.height = 16, .width = 8, .x = 248, .y=136}, .state=0, .velocity={0}, .jump_force=-100, .gravity=130, .p_offset={0}, .slide_up=3, .grounded = false};
+    Player player = {.speed=50, .rect = {.height = 16, .width = 8, .x = (winWidth/2)-4, .y=(winHeight/2)-8}, .state=0, .velocity={0}, .jump_force=-100, .gravity=130, .p_offset={0}, .slide_up=2, .grounded = false};
     player.facing = RIGHT;
 
     CalculateSize(&player, 8, 15);
@@ -132,6 +132,7 @@ int main()
             {
                 winHeight = GetMonitorHeight(GetCurrentMonitor());
                 winWidth = GetMonitorWidth(GetCurrentMonitor());
+                printf("%i, %i", winHeight, winWidth);
             }
             else
             {
@@ -178,7 +179,7 @@ int main()
         EndDrawing();
 
 
-
+    
     }
 
     SaveWorld(world, "worlds/world.saworld");
