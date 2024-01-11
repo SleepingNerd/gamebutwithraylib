@@ -26,23 +26,19 @@ typedef enum {
 } TileState;
 
 
-typedef struct Tile{
-    TileState type;
-    Color color;
-} Tile;
+
 
 typedef struct Chunk{
-    
-
     TileState *tiles;
     Color *colors;
-    Vector2i size;
 } Chunk;
 
 
 // Should be noted that the top left of the world corresponds to arr[0][0]
 // arr and color should be the same size
 typedef struct World{
+    Vector2i chunk_count;
+    Vector2i chunk_size;
     Chunk *chunks;
 } World;
 
@@ -57,11 +53,13 @@ typedef struct World{
 // World_size is accessed like this World_size[y][x]
 void LoadTileTextures();
 void RenderWorld(World world, Vector2i world_size);
-void ChangeTile(World world, Vector2i world_size, Vector2i position);
+void ChangeTile(World world, Vector2i position)
 void ScrollWorld(World world, Camera camera, RenderTexture2D static_world, Vector2 scoll);
 
 // Allocates and creates an empty world
 void EmptyWorld(World *world);
+World* GenerateEmptyWorld(Vector2i chunk_size, Vector2i chunk_count);
+
 
 // io
 void SaveWorld(World world, char *path);

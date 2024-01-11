@@ -9,6 +9,7 @@
 char* texture_names[TILES] = {"SOLID"};
 Texture2D textures[TILES] = {0};
 
+
 void LoadTileTextures()
 {
     char tiles_folder[] = "assets/tiles/";
@@ -33,25 +34,40 @@ void LoadTileTextures()
     }
 }
 
-void ChangeTile(World world, Vector2i world_size, Vector2i position)
+World GenerateEmptyWorld(Vector2i chunk_size, Vector2i chunk_count)
 {
-    if (position.x > world_size.x)
-    {
-        return;
-    }
+    World world = {.chunk_size = chunk_size, .chunks = calloc(chunk_count.x*chunk_count.y, sizeof(Chunk*)), .chunk_count};
+    return world;
+}
+
+void ChangeTile(World world, Vector2i position)
+{
+    Vector2i tile_in_chunk = {.x=position.x%world.chunk_size, .y = position.y%world.chunk_size.y};
+    Vector2i chunk = {.x = position.x / world.chunk_size, .y = position.y/world.chunk_size};
+
 
     for(int y= -5; y++; y<=5)
     {
         for (int x = -5; x++; x<=5)
         {
 
-            world.tiles[(position.y+y)*(world_size.x) +position.x+x] = SOLID;
-            world.colors[(position.y+y)*(world_size.x) +position.x+x] = BEIGE;
+            if (tile_in_chunk.x +x>world.chunk_size && (tile_in_chunk.y + y)<world.chunk_size)
+            {
+                world.chunks->tiles[(position.x%world.chunk_size)+y][tile_in_chunk] = SOLID;
+                world.chunks->color[chunk][tile_in_chunk] = ORANGE;
+                
+            }
+            else
+            {
+                world.chunks->tiles[chunk][tile_in_chunk] = SOLID;
+                world.chunks->color[chunk][tile_in_chunk] = ORANGE;
 
-     
+            }
+
+            
+          
         }
     }
-
 }
 
 void RenderWorld(World world, Vector2i world_size)

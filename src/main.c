@@ -83,11 +83,15 @@ int main()
 
     BeginTextureMode(static_world);
     ClearBackground(WHITE);
-    RenderWorld(world, world.size);
+    //RenderWorld(world, world.);
 
     EndTextureMode();
     
     Image img_slice;
+
+    World world2 = GenerateEmptyWorld((Vector2i){.x = 100, 100}, (Vector2i){.x = 100, 100});
+
+
     while(!WindowShouldClose())
     {
 
@@ -119,7 +123,7 @@ int main()
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
         {
             BeginTextureMode(static_world);
-            ChangeTile(world, world.size, selected_tile_index);
+            ChangeTile(world, selected_tile_index);
             EndTextureMode();
         }
         
