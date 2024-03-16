@@ -347,7 +347,6 @@ void MoveAndUpdate(Player *player, float delta, World world)
 
     VerticalMoveAndUpdate(player, world, delta);
 
-    
     HorizontalMoveAndUpdate(player, world, delta);
 
 

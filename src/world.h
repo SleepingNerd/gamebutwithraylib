@@ -33,14 +33,27 @@ typedef struct Chunk{
     Color *colors;
 } Chunk;
 
+typedef struct World{
+    Vector2i size;
+    TileState *tiles;
+    Color *colors;
+
+} World; 
+
+typedef struct Map{
+    Vector2i chunk_count;
+    Vector2i chunk_size;
+    Chunk **chunks;
+} Map; 
 
 // Should be noted that the top left of the world corresponds to arr[0][0]
 // arr and color should be the same size
+/*
 typedef struct World{
     Vector2i chunk_count;
     Vector2i chunk_size;
     Chunk *chunks;
-} World;
+} World; */
 
 // All tiles
 
@@ -53,12 +66,17 @@ typedef struct World{
 // World_size is accessed like this World_size[y][x]
 void LoadTileTextures();
 void RenderWorld(World world, Vector2i world_size);
-void ChangeTile(World world, Vector2i position)
-void ScrollWorld(World world, Camera camera, RenderTexture2D static_world, Vector2 scoll);
 
 // Allocates and creates an empty world
-void EmptyWorld(World *world);
-World* GenerateEmptyWorld(Vector2i chunk_size, Vector2i chunk_count);
+void EmptyWorld(World *world, Vector2i size);
+void ChangeTile(Map world, Vector2i position);
+
+Chunk *GenerateEmptyChunk(Vector2i chunk_size);
+
+Map GenerateEmptyWorld(Vector2i chunk_size, Vector2i chunk_count);
+
+void ScrollWorld(World world, Camera camera, RenderTexture2D static_world, Vector2 scoll);
+
 
 
 // io

@@ -17,6 +17,10 @@ typedef struct Recti {
     int height;
 } Recti;
 
+// Just for debugging
+void printv2i(Vector2i i);
+
+// Actual functions
 int floor_to_muiltiple(int x, int m);
 int ceiling_to_muiltiple(int x, int m);
 
