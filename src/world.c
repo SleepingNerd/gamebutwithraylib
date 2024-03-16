@@ -43,6 +43,7 @@ Map GenerateEmptyWorld(Vector2i chunk_size, Vector2i chunk_count)
     }
     return m;
 }
+
 Chunk *GenerateEmptyChunk(Vector2i chunk_size)
 {
     Chunk *c = malloc(sizeof(Chunk));
@@ -71,8 +72,6 @@ void ChangeTile(Map world, Vector2i position)
 
             chunk.y = (position.y+y)/world.chunk_size.y;
 
-         
-
 
             if (world.chunks[chunk.x+chunk.y*world.chunk_count.x] == NULL)
             {
@@ -80,11 +79,9 @@ void ChangeTile(Map world, Vector2i position)
             }
 
             // tile_in_chunk.x+x>world.chunk_size.x || (tile_in_chunk.y + y)<world.chunk_size.y
-            if (true)
-            {
-                    world.chunks[chunk.x+chunk.y*world.chunk_count.x]->tiles[tile_in_chunk.x+tile_in_chunk.y*world.chunk_size.x] = SOLID;
-                    world.chunks[chunk.x+chunk.y*world.chunk_count.x]->colors[tile_in_chunk.x+tile_in_chunk.y*world.chunk_size.x] = ORANGE;
-            }
+            world.chunks[chunk.x+chunk.y*world.chunk_count.x]->tiles[tile_in_chunk.x+tile_in_chunk.y*world.chunk_size.x] = SOLID;
+            world.chunks[chunk.x+chunk.y*world.chunk_count.x]->colors[tile_in_chunk.x+tile_in_chunk.y*world.chunk_size.x] = ORANGE;
+
             /*
             else
             {
@@ -105,8 +102,66 @@ void RenderWorld(World world, Vector2i world_size)
             if (world.tiles[y*world_size.x +x] == SOLID)
             {
                 DrawPixel(x, y, BEIGE);
-                //DrawTexture(textures[world[y*world_size.x +x]-1],x*TILE_SIZE,y*TILE_SIZE, WHITE);
             }
+        }
+    }
+}
+
+// Size should be larger than 0 (in both axes), anything else is undefined behaviour
+void DrawWorld(Map world, Vector2i offset, Vector2i size)
+{
+    int offset_from_left_chunk_border = offset.x % world.chunk_size.x;
+    int left_chunk = offset.x / world.chunk_size.x;
+    int width_from_left_chunk_border =  offset_from_left_chunk_border + size.x;
+    int chunk_width = width_from_left_chunk_border/world.chunk_size.x;
+
+    int offset_from_top_chunk_border = offset.y % world.chunk_size.y;
+    int top_chunk = offset.y / world.chunk_size.y;
+
+    int height_from_top_chunk_border = offset_from_top_chunk_border + size.y;
+    int chunk_height = height_from_top_chunk_border/world.chunk_size.y;
+
+    int row_offset;
+
+
+    // Fills upper chunks with full x axis
+    for(int x = 1; x<=chunk_width; x++)
+    {
+         DrawPartOfChunk(world.chunks[top_chunk*world.chunk_size.x+left_chunk+x], 
+         (Vector2i){.x = 0, .y = offset_from_top_chunk_border}, world.chunk_size
+         offset, world.chunk_size);
+    }
+    // Fills lower chunks with full x axis
+    for(int x = 1; x<=chunk_width; x++)
+    {
+         DrawPartOfChunk(world.chunks[top_chunk*world.chunk_size.x+left_chunk+x], 
+         (Vector2i){.x = 0, .y = 0}, (Vect2i){.x = world.chunk_size.x, top_chunk+chunk_height});
+         offset, world.chunk_size);
+    }
+
+
+    // Fills full chunks
+    for(int y = 1; x<=chunk_height; y++)
+    {
+        row_offset = (top_chunk+y)*world.chunk_count.x;
+        for(int x = 1; x<=chunk_width; x++)
+        {
+            DrawPartOfChunk(world.chunks[row_offset+left_chunk+x], 
+            (Vector2i){.x = 0, 0}, world.chunk_size, 
+            offset, world.chunk_size,);
+        }
+    }
+
+}
+void DrawPartOfChunk(Chunk *c, Vector2i origin_in_chunk, Vector2i end_in_chunk, Vector2i offset, Vector2i chunk_size)
+{
+    int row_offset;
+    for (int y = 0; y<end_in_chunk.y; y++)
+    {
+        row_offset = y*chunk_size.x;
+        for (int x = 0; x<end_in_chunk.x; x++)
+        {
+            DrawPixel(x+offset.x, y+offset.y, c.colors[row_offset+x]);
         }
     }
 }
@@ -156,7 +211,7 @@ void EmptyWorld(World *world, Vector2i size)
     world->colors = calloc(total_elements, sizeof(Color));
     if (world->tiles == NULL || world->colors == NULL)
     {
-        printf("Fucking hate tis schoollaptop");
+        printf("Fucking hate tis schoollaptop sometimes");
     }
 
 

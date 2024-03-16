@@ -168,8 +168,6 @@ int main()
             //printf("%f\n", player.rect.width);
             //DrawRectangle(player.rect.x, player.rect.y, player.rect.width, player.rect.height , DARKGREEN);
             
-            DrawTexturePro(test_text, (Rectangle){.x=0, .y=0, .width=2, .height=2}, (Rectangle){.x=0, .y=0, .width=80, .height=80}, (Vector2){.x = 0, .y = 0}, 0.0f, WHITE);
-            DrawTexturePro(test, (Rectangle){.x=0, .y=0, .width=test.width, .height=test.height}, (Rectangle){.x=100, .y=100, .width=test.width, .height=test.height}, (Vector2){.x = 0, .y = 0}, 0.0f, WHITE);
 
 
             player_img_rect.width= fabs(player_img_rect.width)*player.facing;
@@ -181,7 +179,7 @@ int main()
 
         BeginDrawing();
 
-            DrawTexturePro(screen.texture, (Rectangle){.x=0, .y=0, .width=screenWidth, .height=screenHeight}, (Rectangle){.x=0, .y=0, .width=winWidth, .height=winHeight}, (Vector2){.x = 0, .y = 0}, 0.0f, WHITE);
+            DrawTexturePro(screen.texture, (Rectangle){.x=0, .y=0, .width=screenWidth, .height=-screenHeight}, (Rectangle){.x=0, .y=0, .width=winWidth, .height=winHeight}, (Vector2){.x = 0, .y = 0}, 0.0f, WHITE);
 
         EndDrawing();
     }
