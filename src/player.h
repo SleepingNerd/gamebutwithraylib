@@ -34,5 +34,5 @@ typedef struct Player{
 void CalculateSize(Player *player , int width, int height);
 void CalculateJump(Player *player, int height, float peak_time);
 void ProcessInput(Player *player, bool left, bool right, bool jump);
-void MoveAndUpdate(Player *player, float delta, World world);
+void MoveAndUpdate(Player *player, float delta, Map world);
 

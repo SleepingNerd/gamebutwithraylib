@@ -9,6 +9,7 @@
 char* texture_names[TILES] = {"SOLID"};
 Texture2D textures[TILES] = {0};
 
+extern Texture chunk_texture;
 
 void LoadTileTextures()
 {
@@ -49,6 +50,14 @@ Chunk *GenerateEmptyChunk(Vector2i chunk_size)
     Chunk *c = malloc(sizeof(Chunk));
     c->colors = calloc(chunk_size.y, chunk_size.x*sizeof(Color));
     c->tiles = calloc(chunk_size.y, chunk_size.x*sizeof(TileState));
+    c->image.data = (void*)c->colors;
+    c->image.format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8;
+    c->image.width = chunk_size.x;
+    c->image.height = chunk_size.y;
+    c->image.mipmaps = 1;
+
+
+
     return c;
 }
 
@@ -108,62 +117,111 @@ void RenderWorld(World world, Vector2i world_size)
 }
 
 // Size should be larger than 0 (in both axes), anything else is undefined behaviour
-void DrawWorld(Map world, Vector2i offset, Vector2i size)
+void DrawWorld(Map world, Vector2i offset, Vector2i size, RenderTexture2D target)
 {
     int offset_from_left_chunk_border = offset.x % world.chunk_size.x;
     int left_chunk = offset.x / world.chunk_size.x;
+
+
     int width_from_left_chunk_border =  offset_from_left_chunk_border + size.x;
     int chunk_width = width_from_left_chunk_border/world.chunk_size.x;
 
     int offset_from_top_chunk_border = offset.y % world.chunk_size.y;
     int top_chunk = offset.y / world.chunk_size.y;
 
+
     int height_from_top_chunk_border = offset_from_top_chunk_border + size.y;
     int chunk_height = height_from_top_chunk_border/world.chunk_size.y;
 
     int row_offset;
 
+    Vect2i origin_in_chunk;
+    Vect2i end_in_chunk;
 
-    // Fills upper chunks with full x axis
-    for(int x = 1; x<=chunk_width; x++)
+    // I could implement this all in different for loops for a slight performance gain but I don't wanna debug that all
+    for(int y = 0; y<=chunk_height; y++)
     {
-         DrawPartOfChunk(world.chunks[top_chunk*world.chunk_size.x+left_chunk+x], 
-         (Vector2i){.x = 0, .y = offset_from_top_chunk_border}, world.chunk_size
-         offset, world.chunk_size);
-    }
-    // Fills lower chunks with full x axis
-    for(int x = 1; x<=chunk_width; x++)
-    {
-         DrawPartOfChunk(world.chunks[top_chunk*world.chunk_size.x+left_chunk+x], 
-         (Vector2i){.x = 0, .y = 0}, (Vect2i){.x = world.chunk_size.x, top_chunk+chunk_height});
-         offset, world.chunk_size);
-    }
+        origin_in_chunk.y = 0;
+        end_in_chunk.y = world.chunk_size.y; 
 
 
-    // Fills full chunks
-    for(int y = 1; x<=chunk_height; y++)
-    {
-        row_offset = (top_chunk+y)*world.chunk_count.x;
-        for(int x = 1; x<=chunk_width; x++)
+        if (y==0)
         {
+            origin_in_chunk.y = offset_from_top_chunk_border;
+        }
+        if (y==chunk_height)
+        {
+            end_in_chunk.y = (offset.y+size.y)%world.chunk_size.y;
+        }
+      
+
+        row_offset = (top_chunk+y)*world.chunk_count.x;
+
+        for(int x = 0; x<=chunk_width; x++)
+        {
+            origin_in_chunk.x = 0;
+            end_in_chunk.x = world.chunk_size.x; 
+
+
+            if (x==0)
+            {
+                origin_in_chunk.x = offset_from_left_chunk_border;
+
+
+            }
+            if (x==chunk_width)
+            {
+                end_in_chunk.x = (offset.x+size.x)%world.chunk_size.x;
+            }
+            
+            if (world.chunks[row_offset+left_chunk+x] == NULL)
+            { 
+            world.chunks[row_offset+left_chunk+x]= GenerateEmptyChunk(world.chunk_size);
+            }
             DrawPartOfChunk(world.chunks[row_offset+left_chunk+x], 
-            (Vector2i){.x = 0, 0}, world.chunk_size, 
-            offset, world.chunk_size,);
+            origin_in_chunk, end_in_chunk, 
+            (Vect2i){.x=(left_chunk+x)*world.chunk_size.x, .y=(top_chunk+y)*world.chunk_size.y}, world.chunk_size, target);
+
+           
+
+
+
         }
     }
-
+    printf("cycle\n,");
 }
-void DrawPartOfChunk(Chunk *c, Vector2i origin_in_chunk, Vector2i end_in_chunk, Vector2i offset, Vector2i chunk_size)
+// Off
+void DrawPartOfChunk(Chunk *c, Vector2i origin_in_chunk, Vector2i end_in_chunk, Vector2i offset, Vector2i chunk_size, RenderTexture2D target)
 {
-    int row_offset;
+
+    
+    printv2i(origin_in_chunk);
+    printv2i(end_in_chunk);
+    printv2i(offset);
+    printv2i(chunk_size);
+    printf(".\n");
+
+
+
+    // 35-50 fps
+    //Image sliced = ImageFromImage(c->image, (Rectangle){.x=origin_in_chunk.x, .y = origin_in_chunk.y, .width = end_in_chunk.x-origin_in_chunk.x, .height= end_in_chunk.y-origin_in_chunk.y});                                                  // Create an image from another image piece
+    //Texture sliced_texture = LoadTextureFromImage(sliced);
+   // DrawTexture(sliced_texture, offset.x+origin_in_chunk.x*chunk_size.x, offset.y+origin_in_chunk.y*chunk_size.y, WHITE);
+    UpdateTexture(chunk_texture, c->image.data);  
+    DrawTextureRec(chunk_texture, (Rectangle){.x=origin_in_chunk.x, .y = origin_in_chunk.y, .width = end_in_chunk.x-origin_in_chunk.x, .height= end_in_chunk.y-origin_in_chunk.y},  (Vector2){.x=offset.x, .y=offset.y}, WHITE);
+    //DrawTexture(chunk_texture, offset.x+origin_in_chunk.x*chunk_size.x, offset.y+origin_in_chunk.y*chunk_size.y, WHITE);
+
+    //UpdateTextureRec(target.texture, (Rectangle){.x = offset.x+origin_in_chunk.x*chunk_size.x, .y = offset.y+origin_in_chunk.y*chunk_size.y, .width = sliced.width, .height = sliced.height}, sliced.data);
+    /*int row_offset;
     for (int y = 0; y<end_in_chunk.y; y++)
     {
         row_offset = y*chunk_size.x;
         for (int x = 0; x<end_in_chunk.x; x++)
         {
-            DrawPixel(x+offset.x, y+offset.y, c.colors[row_offset+x]);
+            DrawPixel(x+offset.x, y+offset.y, c->colors[row_offset+x]);
+
         }
-    }
+    }*/
 }
 
 void SaveWorld(World world, char *path)

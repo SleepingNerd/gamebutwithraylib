@@ -339,15 +339,19 @@ bool VerticalMoveAndUpdate(Player *player, World world, float delta)
 
 
 // Applies and updates velocity and position, applies gravity
-void MoveAndUpdate(Player *player, float delta, World world)
+void MoveAndUpdate(Player *player, float delta, Map world)
 {
 
-    player->grounded = false;
+    //player->grounded = false;
 
 
-    VerticalMoveAndUpdate(player, world, delta);
+    //VerticalMoveAndUpdate(player, world, delta);
 
-    HorizontalMoveAndUpdate(player, world, delta);
+    //HorizontalMoveAndUpdate(player, world, delta);
+
+
+    player->rect.x += player->velocity.x;
+    player->rect.x += player->velocity.y;
 
 
     // Applying gravity    

@@ -12,6 +12,7 @@
 
 #define MOUSE_OVERLAY (Color){ 211, 176, 131, 100 }   
 
+Texture chunk_texture;
 
 
 
@@ -21,7 +22,7 @@ int main()
     int winWidth = 640;
     int winHeight = 360;
 
-    
+    // Any screen dimension is not allowed to be any larger than (the chunk dimension - 2
     int screenWidth = 640;
     int screenHeight = 360;
    
@@ -41,9 +42,7 @@ int main()
     //SetTargetFPS(60);
 
     Vector2i tile_size = {.x = 16, .y = 16};
-    World world;
 
-    EmptyWorld(&world, (Vector2i){.x = 100, .y = 100});
 
 
 
@@ -60,11 +59,9 @@ int main()
 
     Player player = {.speed=50, .rect = {.height = 16, .width = 8, .x = (winWidth/2)-4, .y=(winHeight/2)-8}, .state=0, .velocity={0}, .jump_force=-100, .gravity=130, .p_offset={0}, .slide_up=2, .grounded = false};
     player.facing = RIGHT;
-    printf("??Ifjk");
 
     CalculateSize(&player, 8, 15);
     
-    printf("??Ifjk");
 
     Color *image = calloc(4, sizeof(Color));
     image[0] = RED;
@@ -72,8 +69,6 @@ int main()
     image[2] = GREEN;
     image[3] = GRAY;
 
-    Image test_img = {.data = image, .format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8, .height = 2, .width = 2, .mipmaps = 1};
-    Texture test_text = LoadTextureFromImage(test_img);
 
 
     Rectangle player_img_rect = {.height=16, .width=8,.x=0,.y=0};
@@ -87,10 +82,13 @@ int main()
     EndTextureMode();
     Image img_slice;
 
-    Map world2 = GenerateEmptyWorld((Vector2i){.x = 512, .y = 512}, (Vector2i){.x = 4096, .y =4096});
+    Map world = GenerateEmptyWorld((Vector2i){.x = 512, .y = 512}, (Vector2i){.x = 4096, .y =4096});
 
-   
-   
+    Image test_img = {.data = calloc(world.chunk_size.y, world.chunk_size.x*sizeof(Color)), .format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8, .height = world.chunk_size.y, .width=world.chunk_size.x, .mipmaps = 1};
+
+    chunk_texture = LoadTextureFromImage(test_img);
+    //SetTextureWrap(chunk_texture, 100);                                                  // Set texture wrapping mode
+
 
     while(!WindowShouldClose())
     {
@@ -124,7 +122,7 @@ int main()
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
         {
             BeginTextureMode(static_world);
-            ChangeTile(world2, selected_tile_index);
+            ChangeTile(world, selected_tile_index);
             EndTextureMode();
         }
         
@@ -162,17 +160,16 @@ int main()
             // This is why I have to flip the y
 
 
-
-
-            DrawFPS(10, 10);
-            //printf("%f\n", player.rect.width);
-            //DrawRectangle(player.rect.x, player.rect.y, player.rect.width, player.rect.height , DARKGREEN);
-            
-
-
             player_img_rect.width= fabs(player_img_rect.width)*player.facing;
             Vector2 offset = {.x = (int)(player.rect.x)-(int)camera.offset.x, .y= (int)(player.rect.y)-(int)camera.offset.y};
+            DrawTextureRec(test_anim.frame_arr[anim_m_test.frame],player_img_rect, offset, WHITE);
+
             
+            DrawWorld(world, camera.p_offset, (Vector2i){.x = screenWidth, .y=screenHeight}, screen);
+
+            
+            DrawFPS(10, 10);
+
 
 
         EndTextureMode();
@@ -184,7 +181,6 @@ int main()
         EndDrawing();
     }
 
-    SaveWorld(world, "worlds/world.saworld");
 
   
 

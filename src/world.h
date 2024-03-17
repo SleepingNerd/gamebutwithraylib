@@ -9,6 +9,10 @@
 
 #define TILE_SIZE 1
 #define TILES 1
+// I wasn't on planning on making these pre-set but my hand got forced
+#define CHUNK_SIZE_X 512
+#define CHUNK_SIZE_Y 512
+
 
 // Macro to conver x and y coordinates into the
 //#define COORD_TO_INDEX(X, Y, W_SIZE) ({typeof(x) x = x}) I don't care for now
@@ -30,6 +34,7 @@ typedef enum {
 
 typedef struct Chunk{
     TileState *tiles;
+    Image image;
     Color *colors;
 } Chunk;
 
@@ -43,6 +48,7 @@ typedef struct World{
 typedef struct Map{
     Vector2i chunk_count;
     Vector2i chunk_size;
+
     Chunk **chunks;
 } Map; 
 
@@ -70,9 +76,10 @@ void RenderWorld(World world, Vector2i world_size);
 // Allocates and creates an empty world
 void EmptyWorld(World *world, Vector2i size);
 void ChangeTile(Map world, Vector2i position);
+void DrawWorld(Map world, Vector2i offset, Vector2i size, RenderTexture2D target);
 
 Chunk *GenerateEmptyChunk(Vector2i chunk_size);
-
+void DrawPartOfChunk(Chunk *c, Vector2i origin_in_chunk, Vector2i end_in_chunk, Vector2i offset, Vector2i chunk_size, RenderTexture2D target);
 Map GenerateEmptyWorld(Vector2i chunk_size, Vector2i chunk_count);
 
 void ScrollWorld(World world, Camera camera, RenderTexture2D static_world, Vector2 scoll);
