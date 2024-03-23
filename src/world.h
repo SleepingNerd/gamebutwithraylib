@@ -76,6 +76,8 @@ void RenderWorld(World world, Vector2i world_size);
 // Allocates and creates an empty world
 void EmptyWorld(World *world, Vector2i size);
 void ChangeTile(Map world, Vector2i position);
+TileState GetTileState(Map world, int x, int y);
+
 void DrawWorld(Map world, Vector2i offset, Vector2i size, RenderTexture2D target);
 
 Chunk *GenerateEmptyChunk(Vector2i chunk_size);

@@ -8,6 +8,7 @@
 #include "player.h"
 #include "world.h"
 #include "samath.h"
+
  
 // Calculates your jump, and applies the parameters
 void CalculateJump(Player *player, int height, float peak_time)
@@ -38,14 +39,14 @@ void ProcessInput(Player *player, bool left, bool right, bool jump)
 
 
 
-bool Collision(Player *player, World world, int left_tile, int right_tile, int top_tile, int bottom_tile)
+bool Collision(Player *player, Map world, int left_tile, int right_tile, int top_tile, int bottom_tile)
 {
     for (int x = left_tile; x<=right_tile; x++)
     {
         
         for (int y = top_tile; y<=bottom_tile; y++)
         {
-            if (world.tiles[(x)+(y *world.size.x)] == SOLID)
+            if (GetTileState(world,(x),(y )) == SOLID)
             {
                 return true;
             }
@@ -57,7 +58,7 @@ bool Collision(Player *player, World world, int left_tile, int right_tile, int t
 
 // Assumes player last moved down and applies collision accordingly, should be used as sparingly as possible,
 // Always check if player actually crossed a tile before calling
-bool DownCollision(Player *player, World world, int left_tile, int right_tile)
+bool DownCollision(Player *player, Map world, int left_tile, int right_tile)
 {
     int bottom_tile = (player->rect.y+player->p_offset.y)/TILE_SIZE;
 
@@ -66,7 +67,7 @@ bool DownCollision(Player *player, World world, int left_tile, int right_tile)
         for(int i = left_tile; i<=right_tile; i++)
         {
             // Apply setback if moved into tile
-            if (world.tiles[(i)+(bottom_tile *world.size.x)] == SOLID)
+            if (GetTileState(world,(i),(bottom_tile)) == SOLID)
             {
                 player->rect.y = (bottom_tile)*TILE_SIZE-player->rect.height;
                 return true;
@@ -79,14 +80,14 @@ bool DownCollision(Player *player, World world, int left_tile, int right_tile)
 
 // Assumes player last moved up and applies collision accordingly, should be used as sparingly as possible,
 // Always check if player actually crossed a tile before calling
-bool UpCollision(Player *player, World world, int left_tile, int right_tile)
+bool UpCollision(Player *player, Map world, int left_tile, int right_tile)
 {
     int top_tile = (player->rect.y)/TILE_SIZE;
 
     for(int i = left_tile; i<=right_tile; i++)
     {
         // Apply setback if moved into tile
-        if (world.tiles[(i)+(top_tile *world.size.x)] == SOLID)
+        if (GetTileState(world,(i),(top_tile )) == SOLID)
         {
             player->rect.y = (top_tile+1)*TILE_SIZE;
             return true;
@@ -97,7 +98,7 @@ bool UpCollision(Player *player, World world, int left_tile, int right_tile)
 
 // Assumes player last moved right and applies collision accordingly, should be used as sparingly as possible,
 // Always check if player actually crossed a tile before calling
-bool RightCollision(Player *player, World world, int top_tile, int bottom_tile)
+bool RightCollision(Player *player, Map world, int top_tile, int bottom_tile)
 {
 
         int right_tile = (player->rect.x+player->p_offset.x)/TILE_SIZE;
@@ -105,7 +106,8 @@ bool RightCollision(Player *player, World world, int top_tile, int bottom_tile)
 
         for(int i = top_tile; i<= bottom_tile; i++)
         {
-            if (world.tiles[(right_tile)+(i *world.size.x)] == SOLID)
+
+            if (GetTileState(world,(right_tile),(i)) == SOLID)
             {
                 
                 float original_y = player->rect.y;
@@ -142,7 +144,7 @@ bool RightCollision(Player *player, World world, int top_tile, int bottom_tile)
                         for(int y = top_tile-1; y>=new_top_tile; y--)
                         {
 
-                            if (world.tiles[(x)+(y *world.size.x)] == SOLID)
+                            if (GetTileState(world,(x),(y)) == SOLID)
                             {
                                 player->rect.x = right_tile*TILE_SIZE-player->rect.width;
                                 return true;
@@ -160,12 +162,12 @@ bool RightCollision(Player *player, World world, int top_tile, int bottom_tile)
     return false;
 }
 
-bool LeftCollision(Player *player, World world, int top_tile, int bottom_tile)
+bool LeftCollision(Player *player, Map world, int top_tile, int bottom_tile)
 {
     int left_tile = (player->rect.x)/TILE_SIZE;
     for(int i = top_tile; i<= bottom_tile; i++)
     {
-        if (world.tiles[(left_tile)+(i *world.size.x)] == SOLID)
+        if (GetTileState(world,(left_tile),(i )) == SOLID)
         {
             
              // How many tiles the player would slide up 
@@ -192,7 +194,7 @@ bool LeftCollision(Player *player, World world, int top_tile, int bottom_tile)
                     for(int y = top_tile-1; y>=new_top_tile; y--)
                     {
 
-                        if (world.tiles[(x)+(y *world.size.x)] == SOLID)
+                        if (GetTileState(world,(x),(y )) == SOLID)
                         {
                             player->rect.x = (left_tile+1)*TILE_SIZE;
                             return true;
@@ -212,7 +214,7 @@ bool LeftCollision(Player *player, World world, int top_tile, int bottom_tile)
     return false;
 }
 
-bool HorizontalMoveAndUpdate(Player *player, World world, float delta)
+bool HorizontalMoveAndUpdate(Player *player, Map world, float delta)
 {
 
     int top_tile = (player->rect.y)/TILE_SIZE;
@@ -267,7 +269,7 @@ bool HorizontalMoveAndUpdate(Player *player, World world, float delta)
     }
 }
 
-bool VerticalMoveAndUpdate(Player *player, World world, float delta)
+bool VerticalMoveAndUpdate(Player *player, Map world, float delta)
 {
     // Calculate left and right tile, this might still be optimised
     int left_tile = (player->rect.x)/TILE_SIZE;
@@ -342,16 +344,14 @@ bool VerticalMoveAndUpdate(Player *player, World world, float delta)
 void MoveAndUpdate(Player *player, float delta, Map world)
 {
 
-    //player->grounded = false;
+    player->grounded = false;
 
 
-    //VerticalMoveAndUpdate(player, world, delta);
+    VerticalMoveAndUpdate(player, world, delta);
 
-    //HorizontalMoveAndUpdate(player, world, delta);
+    HorizontalMoveAndUpdate(player, world, delta);
 
 
-    player->rect.x += player->velocity.x;
-    player->rect.x += player->velocity.y;
 
 
     // Applying gravity    

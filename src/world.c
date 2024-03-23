@@ -93,16 +93,21 @@ void ChangeTile(Map world, Vector2i position)
             world.chunks[chunk.x+chunk.y*world.chunk_count.x]->tiles[tile_in_chunk.x+tile_in_chunk.y*world.chunk_size.x] = SOLID;
             world.chunks[chunk.x+chunk.y*world.chunk_count.x]->colors[tile_in_chunk.x+tile_in_chunk.y*world.chunk_size.x] = ORANGE;
 
-            /*
-            else
-            {
-                //...
-                world.chunks[chunk.y*world.chunk_size.x+chunk.x].tiles[tile_in_chunk.y*world.chunk_size.x+tile_in_chunk.x] = SOLID;
-                world.chunks[chunk.y*world.chunk_size.x+chunk.x].colors[tile_in_chunk.y*world.chunk_size.x+tile_in_chunk.x] = ORANGE;
-            }*/
+         
         }
     }
 }
+
+TileState GetTileState(Map world, int x, int y)
+{
+    Vector2i tile_in_chunk = {.x=x%world.chunk_size.x, .y = y%world.chunk_size.y};
+    Vector2i chunk = {.x = x / world.chunk_size.x, .y = y/world.chunk_size.y};
+
+    return world.chunks[chunk.x+chunk.y*world.chunk_count.x]->tiles[tile_in_chunk.x+tile_in_chunk.y*world.chunk_size.x];
+
+}
+
+
 
 void RenderWorld(World world, Vector2i world_size)
 {
@@ -140,6 +145,8 @@ void DrawWorld(Map world, Vector2i offset, Vector2i size, RenderTexture2D target
     Vect2i origin_in_chunk;
     Vect2i end_in_chunk;
 
+    Vect2i offset_c = (Vect2i){.x=0, .y=0}; // Screen offset
+
     // I could implement this all in different for loops for a slight performance gain but I don't wanna debug that all
     for(int y = 0; y<=chunk_height; y++)
     {
@@ -158,11 +165,12 @@ void DrawWorld(Map world, Vector2i offset, Vector2i size, RenderTexture2D target
       
 
         row_offset = (top_chunk+y)*world.chunk_count.x;
-
+        offset_c.x = 0;
         for(int x = 0; x<=chunk_width; x++)
         {
             origin_in_chunk.x = 0;
             end_in_chunk.x = world.chunk_size.x; 
+
 
 
             if (x==0)
@@ -180,15 +188,16 @@ void DrawWorld(Map world, Vector2i offset, Vector2i size, RenderTexture2D target
             { 
             world.chunks[row_offset+left_chunk+x]= GenerateEmptyChunk(world.chunk_size);
             }
+
+            
             DrawPartOfChunk(world.chunks[row_offset+left_chunk+x], 
             origin_in_chunk, end_in_chunk, 
-            (Vect2i){.x=(left_chunk+x)*world.chunk_size.x, .y=(top_chunk+y)*world.chunk_size.y}, world.chunk_size, target);
+            offset_c, world.chunk_size, target);
 
-           
-
-
-
+            offset_c.x += end_in_chunk.x - origin_in_chunk.x;
         }
+        offset_c.y += end_in_chunk.y - origin_in_chunk.y;
+
     }
 
 }
