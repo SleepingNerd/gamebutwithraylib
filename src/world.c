@@ -1,10 +1,12 @@
 #include <raylib.h>
+#include <rlgl.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
 #include "samath.h"
 #include "world.h"
+
 //
 char* texture_names[TILES] = {"SOLID"};
 Texture2D textures[TILES] = {0};
@@ -188,18 +190,13 @@ void DrawWorld(Map world, Vector2i offset, Vector2i size, RenderTexture2D target
 
         }
     }
-    printf("cycle\n,");
+
 }
 // Off
 void DrawPartOfChunk(Chunk *c, Vector2i origin_in_chunk, Vector2i end_in_chunk, Vector2i offset, Vector2i chunk_size, RenderTexture2D target)
 {
 
     
-    printv2i(origin_in_chunk);
-    printv2i(end_in_chunk);
-    printv2i(offset);
-    printv2i(chunk_size);
-    printf(".\n");
 
 
 
@@ -207,8 +204,12 @@ void DrawPartOfChunk(Chunk *c, Vector2i origin_in_chunk, Vector2i end_in_chunk, 
     //Image sliced = ImageFromImage(c->image, (Rectangle){.x=origin_in_chunk.x, .y = origin_in_chunk.y, .width = end_in_chunk.x-origin_in_chunk.x, .height= end_in_chunk.y-origin_in_chunk.y});                                                  // Create an image from another image piece
     //Texture sliced_texture = LoadTextureFromImage(sliced);
    // DrawTexture(sliced_texture, offset.x+origin_in_chunk.x*chunk_size.x, offset.y+origin_in_chunk.y*chunk_size.y, WHITE);
+
+   
     UpdateTexture(chunk_texture, c->image.data);  
     DrawTextureRec(chunk_texture, (Rectangle){.x=origin_in_chunk.x, .y = origin_in_chunk.y, .width = end_in_chunk.x-origin_in_chunk.x, .height= end_in_chunk.y-origin_in_chunk.y},  (Vector2){.x=offset.x, .y=offset.y}, WHITE);
+    rlDrawRenderBatchActive();
+
     //DrawTexture(chunk_texture, offset.x+origin_in_chunk.x*chunk_size.x, offset.y+origin_in_chunk.y*chunk_size.y, WHITE);
 
     //UpdateTextureRec(target.texture, (Rectangle){.x = offset.x+origin_in_chunk.x*chunk_size.x, .y = offset.y+origin_in_chunk.y*chunk_size.y, .width = sliced.width, .height = sliced.height}, sliced.data);
@@ -236,10 +237,6 @@ void SaveWorld(World world, char *path)
 void RenderPartOfWorld(World world,  Vector2i offset, Vector2i size,  RenderTexture2D static_world, Vector2i render_coords)
 {
 
-    printf("%i, %i\n", offset.x, offset.y);
-    printf("%i, %i\n", size.x, size.y);
-    printf("%i, %i\n", offset.x, offset.y);
-    printf("...\n");
 
     int i = render_coords.x;
     int j = render_coords.y;
