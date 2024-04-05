@@ -60,6 +60,7 @@ Chunk *GenerateEmptyChunk(Vector2i chunk_size)
     Chunk *c = malloc(sizeof(Chunk));
     c->colors = calloc(chunk_size.y, chunk_size.x*sizeof(Color));
     c->tiles = calloc(chunk_size.y, chunk_size.x*sizeof(TileState));
+    c->moved = calloc(chunk_size.y, chunk_size.x*sizeof(char));
     c->image.data = (void*)c->colors;
     c->image.format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8;
     c->image.width = chunk_size.x;
@@ -158,6 +159,47 @@ void RenderWorld(World world, Vector2i world_size)
         }
     }
 }
+
+void SimulateWorld(Map world)
+{
+
+    for (int i = 0; i<20; i++)
+    {
+
+        if (world.beany_chunks[i] != NULL)
+        {
+            memset(world.beany_chunks[i]->moved, 0, world.chunk_size.y*world.chunk_size.x);
+            for (int x = 0; x<world.chunk_size.x; x++)
+            {
+                for (int y = world.chunk_size.y; y>=0; y--)
+                {
+                    int index = y*world.chunk_size.x+x;
+                    if (world.beany_chunks[i]->moved[index])
+                    {
+                        continue;
+                    }
+
+                    if (world.beany_chunks[i]->tiles[y*world.chunk_size.x+x]==FLUID && (world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x]<2))
+                    {
+                        //printf("%i the under\n", world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x]);
+                        world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x] = FLUID;
+                        world.beany_chunks[i]->colors[(y+1)*world.chunk_size.x+x] = world.beany_chunks[i]->colors[y*world.chunk_size.x+x];
+                        world.beany_chunks[i]->moved[(y+1)*world.chunk_size.x+x] = 1;
+
+                        world.beany_chunks[i]->tiles[y*world.chunk_size.x+x] = VOID;
+                        world.beany_chunks[i]->colors[y*world.chunk_size.x+x] = BLANK;
+
+                    }
+
+                }
+            }
+
+        }
+
+    }
+}
+   
+
 
 // Size should be larger than 0 (in both axes), anything else is undefined behaviour
 void DrawWorld(Map world, Vector2i offset, Vector2i size, RenderTexture2D target)

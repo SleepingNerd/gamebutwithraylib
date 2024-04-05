@@ -23,9 +23,9 @@ extern Texture2D textures[TILES];
 //PIXELFORMAT_UNCOMPRESSED_R8G8B8A8
 typedef enum {
     VOID =  0,
-    SOLID = 1,
+    GAS = 1,
     FLUID = 2,
-    GAS = 3
+    SOLID = 3
 } TileState;
 
 
@@ -35,6 +35,7 @@ typedef struct Chunk{
     TileState *tiles;
     Image image;
     Color *colors;
+    char *moved;
 } Chunk;
 
 typedef struct World{
@@ -87,6 +88,7 @@ Map GenerateEmptyWorld(Vector2i chunk_size, Vector2i chunk_count);
 
 void ScrollWorld(World world, Camera camera, RenderTexture2D static_world, Vector2 scoll);
 
+void SimulateWorld(Map world);
 
 void AddActiveChunk(Map world, Chunk* chunk_p);
 

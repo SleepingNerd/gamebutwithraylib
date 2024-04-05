@@ -18,7 +18,8 @@ Texture chunk_texture;
 
 int main()
 {
-
+    float tick_speed = 0.25;
+    float tick_counter = 0;
     int winWidth = 640;
     int winHeight = 360;
 
@@ -98,6 +99,12 @@ int main()
 
 
         delta_t = GetFrameTime(); 
+        tick_counter += delta_t;
+        if (tick_counter > tick_speed)
+        {
+            tick_counter = 0;
+            SimulateWorld(world);
+        }
 
 
         UpdateAnimationManager(&anim_m_test, &test_anim, GetFrameTime());
@@ -121,10 +128,7 @@ int main()
 
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
         {
-           if (world.beany_chunks == NULL)
-           {
-                printf("\nWhy me????\n");
-            }
+         
             ChangeTile(world, selected_tile_index, SOLID, ORANGE);
         }
         if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
@@ -158,7 +162,6 @@ int main()
 
         //UpdateTexture(screen.texture, img_slice.data);   
         //UnloadImage(img_slice);
-        
 
         BeginTextureMode(screen);
             ClearBackground(WHITE);
