@@ -83,7 +83,10 @@ int main()
     Image img_slice;
 
     Map world = GenerateEmptyWorld((Vector2i){.x = 512, .y = 512}, (Vector2i){.x = 4096, .y =4096});
-
+    if (world.beany_chunks == NULL)
+    {
+            printf("\nWhy me????\n");
+    }
     Image test_img = {.data = calloc(world.chunk_size.y, world.chunk_size.x*sizeof(Color)), .format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8, .height = world.chunk_size.y, .width=world.chunk_size.x, .mipmaps = 1};
 
     chunk_texture = LoadTextureFromImage(test_img);
@@ -118,6 +121,10 @@ int main()
 
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
         {
+           if (world.beany_chunks == NULL)
+           {
+                printf("\nWhy me????\n");
+            }
             ChangeTile(world, selected_tile_index, SOLID, ORANGE);
         }
         if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))

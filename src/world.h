@@ -49,7 +49,6 @@ typedef struct Map{
     Vector2i chunk_size;
 
     Chunk **chunks;
-    Chunk **active_chunks;
     Chunk **beany_chunks;
 } Map; 
 

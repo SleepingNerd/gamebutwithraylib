@@ -39,14 +39,9 @@ void LoadTileTextures()
 
 Map GenerateEmptyWorld(Vector2i chunk_size, Vector2i chunk_count)
 {
-    Map m = {.chunk_size = chunk_size, .chunks = calloc(chunk_count.x*chunk_count.y, sizeof(Chunk*)), .chunk_count=chunk_count, .active_chunks = calloc(20, sizeof(Chunk*)), .beany_chunks = NULL};
+    Map m = {.chunk_size = chunk_size, .chunks = calloc(chunk_count.x*chunk_count.y, sizeof(Chunk*)), .chunk_count=chunk_count, .beany_chunks = calloc(20, sizeof(Chunk*))};
 
-    m.active_chunks = NULL;
-    if (m.active_chunks == NULL)
-    {
-        printf("bruh and wtf");
-    }
-
+ 
     if (m.beany_chunks == NULL)
     {
             printf("\nWhy me????\n");
@@ -55,6 +50,8 @@ Map GenerateEmptyWorld(Vector2i chunk_size, Vector2i chunk_count)
     {
         printf("Can't even allocate 16 MB on this, you suck (probably more now, you still suck though)");
     }
+
+
     return m;
 }
 
@@ -76,12 +73,7 @@ Chunk *GenerateEmptyChunk(Vector2i chunk_size)
 void AddActiveChunk(Map w, Chunk* chunk_p)
 {
 
-    if (w.beany_chunks == NULL)
-    {
-            printf("\nWhy me????\n");
-    }
 
-    printf("...");
     int i;
     for(i = 0; i<20; i++)
     {
@@ -99,7 +91,6 @@ void AddActiveChunk(Map w, Chunk* chunk_p)
             return;
         }
     }
-    printf("???");
 }
 
 
@@ -133,8 +124,12 @@ void ChangeTile(Map world, Vector2i position, TileState tile_state, Color color)
 
             world.chunks[chunk.x+chunk.y*world.chunk_count.x]->tiles[tile_in_chunk.x+tile_in_chunk.y*world.chunk_size.x] = tile_state;
             world.chunks[chunk.x+chunk.y*world.chunk_count.x]->colors[tile_in_chunk.x+tile_in_chunk.y*world.chunk_size.x] = color;
+          
 
-            AddActiveChunk(world, world.chunks[chunk.x+chunk.y*world.chunk_count.x]);
+            if (tile_state != SOLID)
+            {
+                AddActiveChunk(world, world.chunks[chunk.x+chunk.y*world.chunk_count.x]);
+            }
          
         }
     }
@@ -148,7 +143,6 @@ TileState GetTileState(Map world, int x, int y)
     return world.chunks[chunk.x+chunk.y*world.chunk_count.x]->tiles[tile_in_chunk.x+tile_in_chunk.y*world.chunk_size.x];
 
 }
-
 
 
 void RenderWorld(World world, Vector2i world_size)
