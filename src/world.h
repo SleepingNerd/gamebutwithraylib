@@ -26,7 +26,6 @@ typedef enum {
     SOLID = 1,
     FLUID = 2,
     GAS = 3
-
 } TileState;
 
 
@@ -50,6 +49,8 @@ typedef struct Map{
     Vector2i chunk_size;
 
     Chunk **chunks;
+    Chunk **active_chunks;
+    Chunk **beany_chunks;
 } Map; 
 
 // Should be noted that the top left of the world corresponds to arr[0][0]
@@ -73,9 +74,10 @@ typedef struct World{
 void LoadTileTextures();
 void RenderWorld(World world, Vector2i world_size);
 
+
 // Allocates and creates an empty world
 void EmptyWorld(World *world, Vector2i size);
-void ChangeTile(Map world, Vector2i position);
+void ChangeTile(Map world, Vector2i position, TileState tile_state, Color color);
 TileState GetTileState(Map world, int x, int y);
 
 void DrawWorld(Map world, Vector2i offset, Vector2i size, RenderTexture2D target);
@@ -87,6 +89,7 @@ Map GenerateEmptyWorld(Vector2i chunk_size, Vector2i chunk_count);
 void ScrollWorld(World world, Camera camera, RenderTexture2D static_world, Vector2 scoll);
 
 
+void AddActiveChunk(Map world, Chunk* chunk_p);
 
 // io
 void SaveWorld(World world, char *path);

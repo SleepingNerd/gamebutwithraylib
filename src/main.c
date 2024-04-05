@@ -97,10 +97,6 @@ int main()
         delta_t = GetFrameTime(); 
 
 
-        if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
-        {
-            delta_t /=2;
-        }
         UpdateAnimationManager(&anim_m_test, &test_anim, GetFrameTime());
 
         ProcessInput(&player, IsKeyDown(KEY_LEFT), IsKeyDown(KEY_RIGHT), IsKeyDown(KEY_UP));
@@ -122,7 +118,11 @@ int main()
 
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
         {
-            ChangeTile(world, selected_tile_index);
+            ChangeTile(world, selected_tile_index, SOLID, ORANGE);
+        }
+        if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
+        {
+            ChangeTile(world, selected_tile_index, FLUID, BLUE);
         }
         
 

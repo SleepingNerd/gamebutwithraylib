@@ -12,7 +12,7 @@ build: $(OFILES)
 	./$(EXECUTABLE)
 
 %.o: %.c
-	 gcc $? -o $@ -c -isystem $(INCLUDE)
+	 gcc  $? -o $@ -c -isystem $(INCLUDE)
 
 
 clean:

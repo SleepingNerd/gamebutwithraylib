@@ -39,10 +39,21 @@ void LoadTileTextures()
 
 Map GenerateEmptyWorld(Vector2i chunk_size, Vector2i chunk_count)
 {
-    Map m = {.chunk_size = chunk_size, .chunks = calloc(chunk_count.x*chunk_count.y, sizeof(Chunk*)), .chunk_count=chunk_count};
+    Map m = {.chunk_size = chunk_size, .chunks = calloc(chunk_count.x*chunk_count.y, sizeof(Chunk*)), .chunk_count=chunk_count, .active_chunks = calloc(20, sizeof(Chunk*)), .beany_chunks = NULL};
+
+    m.active_chunks = NULL;
+    if (m.active_chunks == NULL)
+    {
+        printf("bruh and wtf");
+    }
+
+    if (m.beany_chunks == NULL)
+    {
+            printf("\nWhy me????\n");
+    }
     if (m.chunks == NULL)
     {
-        printf("Can't even allocate 16 MB on this, you suck");
+        printf("Can't even allocate 16 MB on this, you suck (probably more now, you still suck though)");
     }
     return m;
 }
@@ -57,24 +68,51 @@ Chunk *GenerateEmptyChunk(Vector2i chunk_size)
     c->image.width = chunk_size.x;
     c->image.height = chunk_size.y;
     c->image.mipmaps = 1;
-
-
+    
 
     return c;
 }
 
+void AddActiveChunk(Map w, Chunk* chunk_p)
+{
+
+    if (w.beany_chunks == NULL)
+    {
+            printf("\nWhy me????\n");
+    }
+
+    printf("...");
+    int i;
+    for(i = 0; i<20; i++)
+    {
+        if (w.beany_chunks[i]==chunk_p)
+        {
+            return;
+        }
+    }
+
+    for(i = 0; i<20; i++)
+    {
+        if (w.beany_chunks[i]==NULL)
+        {
+            w.beany_chunks[i] = chunk_p;
+            return;
+        }
+    }
+    printf("???");
+}
 
 
-void ChangeTile(Map world, Vector2i position)
+void ChangeTile(Map world, Vector2i position, TileState tile_state, Color color)
 {
     Vector2i tile_in_chunk = {.x=position.x%world.chunk_size.x, .y = position.y%world.chunk_size.y};
     Vector2i chunk = {.x = position.x / world.chunk_size.x, .y = position.y/world.chunk_size.y};
 
     
 
-    for(int y= -5; y++; y<=5)
+    for(int y = -1; y<=1; y++)
     {
-        for (int x = -5; x++; x<=5)
+        for (int x = -1; x<=1; x++)
         {
             tile_in_chunk.x = (position.x+x)%world.chunk_size.x; 
 
@@ -89,10 +127,14 @@ void ChangeTile(Map world, Vector2i position)
                 world.chunks[chunk.x+chunk.y*world.chunk_count.x] = GenerateEmptyChunk(world.chunk_size);
             }
 
-            // tile_in_chunk.x+x>world.chunk_size.x || (tile_in_chunk.y + y)<world.chunk_size.y
-            world.chunks[chunk.x+chunk.y*world.chunk_count.x]->tiles[tile_in_chunk.x+tile_in_chunk.y*world.chunk_size.x] = SOLID;
-            world.chunks[chunk.x+chunk.y*world.chunk_count.x]->colors[tile_in_chunk.x+tile_in_chunk.y*world.chunk_size.x] = ORANGE;
 
+            // tile_in_chunk.x+x>world.chunk_size.x || (tile_in_chunk.y + y)<world.chunk_size.y
+
+
+            world.chunks[chunk.x+chunk.y*world.chunk_count.x]->tiles[tile_in_chunk.x+tile_in_chunk.y*world.chunk_size.x] = tile_state;
+            world.chunks[chunk.x+chunk.y*world.chunk_count.x]->colors[tile_in_chunk.x+tile_in_chunk.y*world.chunk_size.x] = color;
+
+            AddActiveChunk(world, world.chunks[chunk.x+chunk.y*world.chunk_count.x]);
          
         }
     }
@@ -186,7 +228,7 @@ void DrawWorld(Map world, Vector2i offset, Vector2i size, RenderTexture2D target
             
             if (world.chunks[row_offset+left_chunk+x] == NULL)
             { 
-            world.chunks[row_offset+left_chunk+x]= GenerateEmptyChunk(world.chunk_size);
+                world.chunks[row_offset+left_chunk+x]= GenerateEmptyChunk(world.chunk_size);
             }
 
             
