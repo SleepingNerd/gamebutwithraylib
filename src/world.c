@@ -181,6 +181,7 @@ void SimulateWorld(Map world)
 
                     if (world.beany_chunks[i]->tiles[y*world.chunk_size.x+x]==FLUID && (world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x]<2))
                     {
+                        //printf("%i\n", SOLID);
                         //printf("%i the under\n", world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x]);
                         world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x] = FLUID;
                         world.beany_chunks[i]->colors[(y+1)*world.chunk_size.x+x] = world.beany_chunks[i]->colors[y*world.chunk_size.x+x];

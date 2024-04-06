@@ -69,6 +69,7 @@ bool DownCollision(Player *player, Map world, int left_tile, int right_tile)
             // Apply setback if moved into tile
             if (GetTileState(world,(i),(bottom_tile)) == SOLID)
             {
+                //printf("?");
                 player->rect.y = (bottom_tile)*TILE_SIZE-player->rect.height;
                 return true;
                 

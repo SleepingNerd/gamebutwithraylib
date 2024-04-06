@@ -134,6 +134,7 @@ int main()
         if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
         {
             ChangeTile(world, selected_tile_index, FLUID, BLUE);
+            //printf("%i\n", GetTileState(world, selected_tile_index.x, selected_tile_index.y));
         }
         
 
