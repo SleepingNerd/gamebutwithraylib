@@ -13,6 +13,10 @@
 #define CHUNK_SIZE_X 512
 #define CHUNK_SIZE_Y 512
 
+// For chunks and subchuks
+#define active 1
+#define inactive 0
+
 
 // Macro to conver x and y coordinates into the
 //#define COORD_TO_INDEX(X, Y, W_SIZE) ({typeof(x) x = x}) I don't care for now
@@ -36,6 +40,7 @@ typedef struct Chunk{
     Image image;
     Color *colors;
     char *moved;
+    char *subchunks; // keeps track of which subchunks are active
 } Chunk;
 
 typedef struct World{
@@ -48,6 +53,9 @@ typedef struct World{
 typedef struct Map{
     Vector2i chunk_count;
     Vector2i chunk_size;
+    Vector2i subchunk_size; // Make sure it fit
+
+
 
     Chunk **chunks;
     Chunk **beany_chunks;
@@ -82,9 +90,9 @@ TileState GetTileState(Map world, int x, int y);
 
 void DrawWorld(Map world, Vector2i offset, Vector2i size, RenderTexture2D target);
 
-Chunk *GenerateEmptyChunk(Vector2i chunk_size);
+Chunk *GenerateEmptyChunk(Vector2i chunk_size, Vector2i subchunk_size);
 void DrawPartOfChunk(Chunk *c, Vector2i origin_in_chunk, Vector2i end_in_chunk, Vector2i offset, Vector2i chunk_size, RenderTexture2D target);
-Map GenerateEmptyWorld(Vector2i chunk_size, Vector2i chunk_count);
+Map GenerateEmptyWorld(Vector2i chunk_size, Vector2i chunk_count, Vector2i subchunk_size);
 
 void ScrollWorld(World world, Camera camera, RenderTexture2D static_world, Vector2 scoll);
 

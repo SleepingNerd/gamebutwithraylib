@@ -83,7 +83,7 @@ int main()
     EndTextureMode();
     Image img_slice;
 
-    Map world = GenerateEmptyWorld((Vector2i){.x = 512, .y = 512}, (Vector2i){.x = 4096, .y =4096});
+    Map world = GenerateEmptyWorld((Vector2i){.x = 512, .y = 512}, (Vector2i){.x = 4096, .y =4096}, (Vector2i){.x = 8, .y = 8}); // 64 by 64 subchunks
     if (world.beany_chunks == NULL)
     {
             printf("\nWhy me????\n");
