@@ -159,6 +159,21 @@ void RenderWorld(World world, Vector2i world_size)
         }
     }
 }
+bool try_to_move(Chunk* chunk, int origin_i, int new_i)
+{
+    if (chunk->tiles[new_i]<2)
+    {
+                         
+        chunk->tiles[new_i] = FLUID;
+        chunk->colors[new_i] =chunk->colors[origin_i];
+        chunk->moved[new_i] = 1;
+
+        chunk->tiles[origin_i] = VOID;
+        chunk->colors[origin_i] = BLANK;
+        chunk->moved[origin_i] = 0;
+        return true;
+    }
+}
 
 void SimulateWorld(Map world)
 {
@@ -178,17 +193,81 @@ void SimulateWorld(Map world)
                     {
                         continue;
                     }
-
-                    if (world.beany_chunks[i]->tiles[y*world.chunk_size.x+x]==FLUID && (world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x]<2))
+                    
+                    if (world.beany_chunks[i]->tiles[y*world.chunk_size.x+x]==FLUID)
                     {
-                        //printf("%i\n", SOLID);
-                        //printf("%i the under\n", world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x]);
-                        world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x] = FLUID;
-                        world.beany_chunks[i]->colors[(y+1)*world.chunk_size.x+x] = world.beany_chunks[i]->colors[y*world.chunk_size.x+x];
-                        world.beany_chunks[i]->moved[(y+1)*world.chunk_size.x+x] = 1;
 
-                        world.beany_chunks[i]->tiles[y*world.chunk_size.x+x] = VOID;
-                        world.beany_chunks[i]->colors[y*world.chunk_size.x+x] = BLANK;
+                        if ((world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x]<2))
+                        {
+                            //printf("%i\n", SOLID);
+                            //printf("%i the under\n", world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x]);
+                            world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x] = FLUID;
+                            world.beany_chunks[i]->colors[(y+1)*world.chunk_size.x+x] = world.beany_chunks[i]->colors[y*world.chunk_size.x+x];
+                            world.beany_chunks[i]->moved[(y+1)*world.chunk_size.x+x] = 1;
+
+                            world.beany_chunks[i]->tiles[y*world.chunk_size.x+x] = VOID;
+                            world.beany_chunks[i]->colors[y*world.chunk_size.x+x] = BLANK;
+
+                        }
+                        else if (world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x+1]<2)
+                        {
+                            //printf("%i\n", SOLID);
+                            //printf("%i the under\n", world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x]);
+                            world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x+1] = FLUID;
+                            world.beany_chunks[i]->colors[(y+1)*world.chunk_size.x+x+1] = world.beany_chunks[i]->colors[y*world.chunk_size.x+x];
+                            world.beany_chunks[i]->moved[(y+1)*world.chunk_size.x+x+1] = 1;
+
+                            world.beany_chunks[i]->tiles[y*world.chunk_size.x+x] = VOID;
+                            world.beany_chunks[i]->colors[y*world.chunk_size.x+x] = BLANK;
+
+                        }
+                        else if (world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x-1]<2)
+                        {
+                            //printf("%i\n", SOLID);
+                            //printf("%i the under\n", world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x]);
+                            world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x-1] = FLUID;
+                            world.beany_chunks[i]->colors[(y+1)*world.chunk_size.x+x-1] = world.beany_chunks[i]->colors[y*world.chunk_size.x+x];
+                            world.beany_chunks[i]->moved[(y+1)*world.chunk_size.x+x-1] = 1;
+
+                            world.beany_chunks[i]->tiles[y*world.chunk_size.x+x] = VOID;
+                            world.beany_chunks[i]->colors[y*world.chunk_size.x+x] = BLANK;
+                        }
+
+                    
+                        else if (world.beany_chunks[i]->tiles[y*world.chunk_size.x+x+1]<2)
+                        {
+                                            
+                            world.beany_chunks[i]->tiles[y*world.chunk_size.x+x+1] = FLUID;
+                            world.beany_chunks[i]->colors[y*world.chunk_size.x+x+1] = world.beany_chunks[i]->colors[y*world.chunk_size.x+x];
+                            world.beany_chunks[i]->moved[y*world.chunk_size.x+x+1] = 1;
+
+                            world.beany_chunks[i]->tiles[y*world.chunk_size.x+x] = VOID;
+                            world.beany_chunks[i]->colors[y*world.chunk_size.x+x] = BLANK;
+                            world.beany_chunks[i]->moved[y*world.chunk_size.x+x] = 0;
+                        }
+
+                        else if (world.beany_chunks[i]->tiles[y*world.chunk_size.x+x-1]<2)
+                        {
+                                            
+                            world.beany_chunks[i]->tiles[y*world.chunk_size.x+x-1] = FLUID;
+                            world.beany_chunks[i]->colors[y*world.chunk_size.x+x-1] = world.beany_chunks[i]->colors[y*world.chunk_size.x+x];
+                            world.beany_chunks[i]->moved[y*world.chunk_size.x+x-1] = 1;
+
+                            world.beany_chunks[i]->tiles[y*world.chunk_size.x+x] = VOID;
+                            world.beany_chunks[i]->colors[y*world.chunk_size.x+x] = BLANK;
+                            world.beany_chunks[i]->moved[y*world.chunk_size.x+x] = 0;
+                        } 
+
+                        
+
+                        
+                    
+                        /*
+                        else if (try_to_move(world.beany_chunks[i], y*world.chunk_size.x+x, y*world.chunk_size.x+x+1))
+                        {
+                                try_to_move(world.beany_chunks[i], y*world.chunk_size.x+x, y*world.chunk_size.x+x-1);                        
+                        }*/
+                        
 
                     }
 

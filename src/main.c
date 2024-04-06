@@ -18,7 +18,7 @@ Texture chunk_texture;
 
 int main()
 {
-    float tick_speed = 0.25;
+    float tick_speed = 0.005;
     float tick_counter = 0;
     int winWidth = 640;
     int winHeight = 360;
@@ -136,6 +136,11 @@ int main()
             ChangeTile(world, selected_tile_index, FLUID, BLUE);
             //printf("%i\n", GetTileState(world, selected_tile_index.x, selected_tile_index.y));
         }
+        if (IsMouseButtonDown(MOUSE_MIDDLE_BUTTON))
+        {
+            printf("%i\n", GetTileState(world, selected_tile_index.x, selected_tile_index.y));
+        }
+
         
 
 
