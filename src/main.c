@@ -97,7 +97,6 @@ int main()
     while(!WindowShouldClose())
     {
 
-
         delta_t = GetFrameTime(); 
         tick_counter += delta_t;
         if (tick_counter > tick_speed)
@@ -114,8 +113,7 @@ int main()
         Vector2 prev_player_pos = {.x = player.rect.x, .y =player.rect.y};
 
         MoveAndUpdate(&player, GetFrameTime(), world);
- 
- 
+
         Vector2 scroll ={.x = player.rect.x-prev_player_pos.x, .y =player.rect.y-prev_player_pos.y};
 
         Scroll(&camera, scroll.x, scroll.y);

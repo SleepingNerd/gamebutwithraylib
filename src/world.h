@@ -54,6 +54,20 @@ typedef struct Map{
     Vector2i chunk_count;
     Vector2i chunk_size;
     Vector2i subchunk_size; // Make sure it fit
+    Vector2i subchunk_count; // Make sure it fit
+
+
+    // I'm sure I could calculate them at run time decently quick, but that takes more effort and is probably slower anyway
+    int *inner_subchunks; 
+    int *outer_subchunks; 
+
+    int inner_subchunks_length;
+    int outer_subchunks_length;
+
+
+    // Both are in chunk
+    Vector2i *inner_subchunks_topleft;
+    Vector2i *outer_subchunks_topleft;
 
 
 

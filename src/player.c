@@ -347,7 +347,6 @@ void MoveAndUpdate(Player *player, float delta, Map world)
 
     player->grounded = false;
 
-
     VerticalMoveAndUpdate(player, world, delta);
 
     HorizontalMoveAndUpdate(player, world, delta);
