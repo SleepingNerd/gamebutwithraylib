@@ -103,6 +103,9 @@ int main()
         {
             tick_counter = 0;
             SimulateWorld(world);
+        
+
+
         }
 
 
@@ -130,8 +133,8 @@ int main()
             ChangeTile(world, selected_tile_index, SOLID, ORANGE);
         }
         if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
-        {
-            ChangeTile(world, selected_tile_index, FLUID, BLUE);
+        { 
+            ChangeTile(world, selected_tile_index, FLUID, (Color){ 0, 121, 200+rand()%55, 200 + rand()%55 });
             //printf("%i\n", GetTileState(world, selected_tile_index.x, selected_tile_index.y));
         }
         if (IsMouseButtonDown(MOUSE_MIDDLE_BUTTON))

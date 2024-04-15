@@ -258,9 +258,9 @@ void SimulateWorld(Map world)
               
                 // Technically both 1 over the border
                 int right = world.inner_subchunks_topleft[j].x+world.subchunk_size.x;
-                int bottom = world.inner_subchunks_topleft[j].y+world.subchunk_size.y-1;
+                int bottom = world.inner_subchunks_topleft[j].y+world.subchunk_size.y;
 
-                for(int y = bottom; y>=world.inner_subchunks_topleft[j].y; y--)
+                for(int y = world.inner_subchunks_topleft[j].y; y<bottom; y++)
                 {
                     for(int x = world.inner_subchunks_topleft[j].x; x<right; x++)
                     {
@@ -289,7 +289,6 @@ void SimulateWorld(Map world)
 
                             }
 
-                             
                             else if (world.beany_chunks[i]->tiles[y*world.chunk_size.x+x+1]<2)
                             {
                                 world.beany_chunks[i]->tiles[y*world.chunk_size.x+x+1] = FLUID;
@@ -310,7 +309,8 @@ void SimulateWorld(Map world)
                                 world.beany_chunks[i]->tiles[y*world.chunk_size.x+x] = VOID;
                                 world.beany_chunks[i]->colors[y*world.chunk_size.x+x] = BLANK;
                                 world.beany_chunks[i]->moved[y*world.chunk_size.x+x] = 0;
-                            } 
+                            }
+
                             else if (world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x+1]<2)
                             {
 
@@ -322,6 +322,7 @@ void SimulateWorld(Map world)
 
                                 world.beany_chunks[i]->tiles[y*world.chunk_size.x+x] = VOID;
                                 world.beany_chunks[i]->colors[y*world.chunk_size.x+x] = BLANK;
+
                             }
                             else if (world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x-1]<2)
                             {
@@ -336,13 +337,16 @@ void SimulateWorld(Map world)
                                 world.beany_chunks[i]->colors[y*world.chunk_size.x+x] = BLANK;
                             }
 
-                       
+                        
+                          
+                            
                         }
 
 
                     }
                 }
             }
+        
             /*
             for (int x = 0; x<world.chunk_size.x; x++)
             {

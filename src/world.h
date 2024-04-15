@@ -37,6 +37,7 @@ typedef enum {
 
 typedef struct Chunk{
     TileState *tiles;
+
     Image image;
     Color *colors;
     char *moved;
