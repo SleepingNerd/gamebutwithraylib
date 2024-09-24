@@ -54,8 +54,8 @@ Map GenerateEmptyWorld(Vector2i chunk_size, Vector2i chunk_count, Vector2i subch
     .inner_subchunks_topleft = calloc(subchunk_count.x*subchunk_count.y, sizeof(Vector2i)), .outer_subchunks_topleft = calloc(subchunk_count.x*subchunk_count.y, sizeof(Vector2i))
     };
     
-    printf("%i, %i", subchunk_count.x, subchunk_count.y);
-    printf("%i, %i\n", subchunk_size.x, subchunk_size.y);
+   // printf("%i, %i", subchunk_count.x, subchunk_count.y);
+    //printf("%i, %i\n", subchunk_size.x, subchunk_size.y);
 
 
     for (int x = 0; x<subchunk_count.x; x++)
@@ -252,6 +252,7 @@ void SimulateWorld(Map world)
         {
 
             memset(world.beany_chunks[i]->moved, 0, world.chunk_size.y*world.chunk_size.x);
+            
             for (int j = 0; j<world.inner_subchunks_length; j++)
             {             
 
@@ -259,6 +260,7 @@ void SimulateWorld(Map world)
                 // Technically both 1 over the border
                 int right = world.inner_subchunks_topleft[j].x+world.subchunk_size.x;
                 int bottom = world.inner_subchunks_topleft[j].y+world.subchunk_size.y;
+
                 //for(int y = bottom-1; y>=world.inner_subchunks_topleft[j].y; y--)
 
                 
@@ -288,6 +290,8 @@ void SimulateWorld(Map world)
 
                                 world.beany_chunks[i]->tiles[y*world.chunk_size.x+x] = VOID;
                                 world.beany_chunks[i]->colors[y*world.chunk_size.x+x] = BLANK;
+                                world.beany_chunks[i]->moved[y*world.chunk_size.x+x] = 0;
+
 
                             }
 
@@ -302,6 +306,8 @@ void SimulateWorld(Map world)
 
                                 world.beany_chunks[i]->tiles[y*world.chunk_size.x+x] = VOID;
                                 world.beany_chunks[i]->colors[y*world.chunk_size.x+x] = BLANK;
+                                world.beany_chunks[i]->moved[y*world.chunk_size.x+x] = 0;
+
 
                             }
                             else if (world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x-1]<2)
@@ -315,6 +321,125 @@ void SimulateWorld(Map world)
 
                                 world.beany_chunks[i]->tiles[y*world.chunk_size.x+x] = VOID;
                                 world.beany_chunks[i]->colors[y*world.chunk_size.x+x] = BLANK;
+                                world.beany_chunks[i]->moved[y*world.chunk_size.x+x] = 0;
+
+                            }
+
+                            else if (world.beany_chunks[i]->tiles[y*world.chunk_size.x+x+1]<2)
+                            {
+                                world.beany_chunks[i]->tiles[y*world.chunk_size.x+x+1] = FLUID;
+                                world.beany_chunks[i]->colors[y*world.chunk_size.x+x+1] = world.beany_chunks[i]->colors[y*world.chunk_size.x+x];
+                                world.beany_chunks[i]->moved[y*world.chunk_size.x+x+1] = 1;
+
+                                world.beany_chunks[i]->tiles[y*world.chunk_size.x+x] = VOID;
+                                world.beany_chunks[i]->colors[y*world.chunk_size.x+x] = BLANK;
+                                world.beany_chunks[i]->moved[y*world.chunk_size.x+x] = 0;
+                            }
+
+                            else if (world.beany_chunks[i]->tiles[y*world.chunk_size.x+x-1]<2)
+                            {
+                                world.beany_chunks[i]->tiles[y*world.chunk_size.x+x-1] = FLUID;
+                                world.beany_chunks[i]->colors[y*world.chunk_size.x+x-1] = world.beany_chunks[i]->colors[y*world.chunk_size.x+x];
+                                world.beany_chunks[i]->moved[y*world.chunk_size.x+x-1] = 1;
+
+                                world.beany_chunks[i]->tiles[y*world.chunk_size.x+x] = VOID;
+                                world.beany_chunks[i]->colors[y*world.chunk_size.x+x] = BLANK;
+                                world.beany_chunks[i]->moved[y*world.chunk_size.x+x] = 0;
+                            }
+
+                           
+                        }
+                    }
+                }
+            }
+            
+
+            
+        
+        
+        }
+    }
+}
+
+void SimulateWorldVariant(Map world)
+{
+    for (int i = 0; i<20; i++)
+    {
+        if (world.beany_chunks[i] != NULL)
+        {
+
+            memset(world.beany_chunks[i]->moved, 0, world.chunk_size.y*world.chunk_size.x);
+            
+            for (int j = 0; j<world.inner_subchunks_length; j++)
+            {             
+
+              
+                // Technically both 1 over the border
+                int right = world.inner_subchunks_topleft[j].x+world.subchunk_size.x;
+                int bottom = world.inner_subchunks_topleft[j].y+world.subchunk_size.y;
+
+                //for(int y = bottom-1; y>=world.inner_subchunks_topleft[j].y; y--)
+
+                
+                for(int y = bottom-1; y>=world.inner_subchunks_topleft[j].y; y--)
+                {
+                    for(int x = world.inner_subchunks_topleft[j].x; x<(right); x++)
+                    {
+                        int index = y*world.chunk_size.x+x;
+                        if (world.beany_chunks[i]->moved[index])
+                        {
+                            continue;
+                        }
+                  
+
+
+                        if (world.beany_chunks[i]->tiles[index]==FLUID)
+                        {
+
+                            if ((world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x]<2))
+                            {
+                                //printf("I am deeply saad once agin");
+                                //printf("%i\n", SOLID);
+                                //printf("%i the under\n", world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x]);
+                                world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x] = FLUID;
+                                world.beany_chunks[i]->colors[(y+1)*world.chunk_size.x+x] = world.beany_chunks[i]->colors[y*world.chunk_size.x+x];
+                                world.beany_chunks[i]->moved[(y+1)*world.chunk_size.x+x] = 1;
+
+                                world.beany_chunks[i]->tiles[y*world.chunk_size.x+x] = VOID;
+                                world.beany_chunks[i]->colors[y*world.chunk_size.x+x] = BLANK;
+                                world.beany_chunks[i]->moved[y*world.chunk_size.x+x] = 0;
+
+
+                            }
+
+                             else if (world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x+1]<2)
+                            {
+
+                                //printf("%i\n", SOLID);
+                                //printf("%i the under\n", world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x]);
+                                world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x+1] = FLUID;
+                                world.beany_chunks[i]->colors[(y+1)*world.chunk_size.x+x+1] = world.beany_chunks[i]->colors[y*world.chunk_size.x+x];
+                                world.beany_chunks[i]->moved[(y+1)*world.chunk_size.x+x+1] = 1;
+
+                                world.beany_chunks[i]->tiles[y*world.chunk_size.x+x] = VOID;
+                                world.beany_chunks[i]->colors[y*world.chunk_size.x+x] = BLANK;
+                                world.beany_chunks[i]->moved[y*world.chunk_size.x+x] = 0;
+
+
+                            }
+                            else if (world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x-1]<2)
+                            {
+
+                                //printf("%i\n", SOLID);
+                                //printf("%i the under\n", world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x]);
+                                world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x-1] = FLUID;
+                                world.beany_chunks[i]->colors[(y+1)*world.chunk_size.x+x-1] = world.beany_chunks[i]->colors[y*world.chunk_size.x+x];
+                                world.beany_chunks[i]->moved[(y+1)*world.chunk_size.x+x-1] = 1;
+
+                                world.beany_chunks[i]->tiles[y*world.chunk_size.x+x] = VOID;
+                                world.beany_chunks[i]->colors[y*world.chunk_size.x+x] = BLANK;
+                                world.beany_chunks[i]->moved[y*world.chunk_size.x+x] = 0;
+
                             }
 
                             else if (world.beany_chunks[i]->tiles[y*world.chunk_size.x+x+1]<2)
@@ -423,6 +548,7 @@ void DrawWorld(Map world, Vector2i offset, Vector2i size, RenderTexture2D target
 
             
             DrawPartOfChunk(world.chunks[row_offset+left_chunk+x], 
+
             origin_in_chunk, end_in_chunk, 
             offset_c, world.chunk_size, target);
 
@@ -431,7 +557,6 @@ void DrawWorld(Map world, Vector2i offset, Vector2i size, RenderTexture2D target
         offset_c.y += end_in_chunk.y - origin_in_chunk.y;
 
     }
-
 }
 // Off
 void DrawPartOfChunk(Chunk *c, Vector2i origin_in_chunk, Vector2i end_in_chunk, Vector2i offset, Vector2i chunk_size, RenderTexture2D target)
@@ -446,8 +571,32 @@ void DrawPartOfChunk(Chunk *c, Vector2i origin_in_chunk, Vector2i end_in_chunk, 
     //Texture sliced_texture = LoadTextureFromImage(sliced);
    // DrawTexture(sliced_texture, offset.x+origin_in_chunk.x*chunk_size.x, offset.y+origin_in_chunk.y*chunk_size.y, WHITE);
 
-   
+    
     UpdateTexture(chunk_texture, c->image.data);  
+    int subchunk_x;
+    int subchunk_y;
+
+    /*
+    // sc for subchunk
+    for (int x = 0; x<512; x++)
+    {
+        subchunk_x = x/8;
+        for (int y = origin_in_chunk.y/8; y<512; y++)
+        {
+            subchunk_y = y/8;
+            if ((x+y)%2)
+            {
+                DrawRectangle(x*8+offset.x, y*8+offset.y, 8, 8, (Color){.r=240, .g= 240, .b=240, .a=255});
+            }
+            else
+            {
+                DrawRectangle(x*8+offset.x, y*8+offset.y, 8, 8, (Color){.r=220, .g= 220, .b=220, .a=255});
+
+            }
+        }
+            
+    }*/
+
     DrawTextureRec(chunk_texture, (Rectangle){.x=origin_in_chunk.x, .y = origin_in_chunk.y, .width = end_in_chunk.x-origin_in_chunk.x, .height= end_in_chunk.y-origin_in_chunk.y},  (Vector2){.x=offset.x, .y=offset.y}, WHITE);
     rlDrawRenderBatchActive();
 

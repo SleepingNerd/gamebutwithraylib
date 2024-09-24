@@ -54,8 +54,8 @@ typedef struct World{
 typedef struct Map{
     Vector2i chunk_count;
     Vector2i chunk_size;
-    Vector2i subchunk_size; // Make sure it fit
-    Vector2i subchunk_count; // Make sure it fit
+    Vector2i subchunk_size; // Make sure it fits
+    Vector2i subchunk_count; // Make sure it fits
 
 
     // I'm sure I could calculate them at run time decently quick, but that takes more effort and is probably slower anyway
@@ -112,6 +112,8 @@ Map GenerateEmptyWorld(Vector2i chunk_size, Vector2i chunk_count, Vector2i subch
 void ScrollWorld(World world, Camera camera, RenderTexture2D static_world, Vector2 scoll);
 
 void SimulateWorld(Map world);
+void SimulateWorldVariant(Map world);
+
 
 void AddActiveChunk(Map world, Chunk* chunk_p);
 

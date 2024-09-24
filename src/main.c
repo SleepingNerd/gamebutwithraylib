@@ -18,7 +18,7 @@ Texture chunk_texture;
 
 int main()
 {
-    float tick_speed = 0.005;
+    float tick_speed = 0.004;
     float tick_counter = 0;
     int winWidth = 640;
     int winHeight = 360;
@@ -101,9 +101,17 @@ int main()
         tick_counter += delta_t;
         if (tick_counter > tick_speed)
         {
+
             tick_counter = 0;
-            SimulateWorld(world);
-        
+
+            if (rand()%2)
+            {
+                SimulateWorld(world);
+            }
+            else
+            {
+                SimulateWorldVariant(world);
+            }
 
 
         }
@@ -134,7 +142,7 @@ int main()
         }
         if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
         { 
-            ChangeTile(world, selected_tile_index, FLUID, (Color){ 0, 121, 200+rand()%55, 200 + rand()%55 });
+            ChangeTile(world, selected_tile_index, FLUID, (Color){ 0, 121, 200+rand()%55,  100 + rand()%100 });
             //printf("%i\n", GetTileState(world, selected_tile_index.x, selected_tile_index.y));
         }
         if (IsMouseButtonDown(MOUSE_MIDDLE_BUTTON))
@@ -178,9 +186,9 @@ int main()
 
             player_img_rect.width= fabs(player_img_rect.width)*player.facing;
             Vector2 offset = {.x = (int)(player.rect.x)-(int)camera.offset.x, .y= (int)(player.rect.y)-(int)camera.offset.y};
+
             DrawTextureRec(test_anim.frame_arr[anim_m_test.frame],player_img_rect, offset, WHITE);
 
-            
             DrawWorld(world, camera.p_offset, (Vector2i){.x = screenWidth, .y=screenHeight}, screen);
 
             
