@@ -19,6 +19,7 @@ Texture chunk_texture;
 int main()
 {
     float tick_speed = 0.004;
+    int tick_tracker = 0;
     float tick_counter = 0;
     int winWidth = 640;
     int winHeight = 360;
@@ -99,12 +100,23 @@ int main()
 
         delta_t = GetFrameTime(); 
         tick_counter += delta_t;
+        
         if (tick_counter > tick_speed)
         {
-
             tick_counter = 0;
 
-            if (rand()%2)
+            if (tick_tracker %4)
+            {
+                if (rand()%2)
+                {
+                    SimulateWorldVariantThree(world);
+                }
+                else
+                {
+                    SimulateWorldVariantFour(world);
+                }
+            }
+            else if (rand()%2)
             {
                 SimulateWorld(world);
             }
@@ -113,7 +125,7 @@ int main()
                 SimulateWorldVariant(world);
             }
 
-
+            tick_tracker+=1;
         }
 
 

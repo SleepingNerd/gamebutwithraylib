@@ -113,6 +113,9 @@ void ScrollWorld(World world, Camera camera, RenderTexture2D static_world, Vecto
 
 void SimulateWorld(Map world);
 void SimulateWorldVariant(Map world);
+void SimulateWorldVariantThree(Map world);
+void SimulateWorldVariantFour(Map world);
+
 
 
 void AddActiveChunk(Map world, Chunk* chunk_p);
