@@ -10,7 +10,9 @@
 #include "player.h"
 #include "camera.h"
 
+#define OPENGL_VERSION 330
 #define MOUSE_OVERLAY (Color){ 211, 176, 131, 100 }   
+
 
 Texture chunk_texture;
 
@@ -18,9 +20,10 @@ Texture chunk_texture;
 
 int main()
 {
-    float tick_speed = 0.004;
+    float tick_speed =  0.004;
     int tick_tracker = 0;
     float tick_counter = 0;
+    int horizontal_ticks = 2;
     int winWidth = 640;
     int winHeight = 360;
 
@@ -32,6 +35,7 @@ int main()
     InitWindow(winWidth, winHeight, "Best game I've ever seen");
     SetWindowMinSize(screenWidth, screenHeight);
 
+    Shader default_shader = LoadShader("shaders/vertex.glsl", "shaders/fragment.glsl");
     RenderTexture2D screen = LoadRenderTexture(screenWidth, screenHeight);
     RenderTexture2D static_world = LoadRenderTexture(screenWidth, screenHeight);
 
@@ -59,7 +63,7 @@ int main()
 
     LoadTileTextures();
 
-    Player player = {.speed=50, .rect = {.height = 16, .width = 8, .x = (winWidth/2)-4, .y=(winHeight/2)-8}, .state=0, .velocity={0}, .jump_force=-100, .gravity=130, .p_offset={0}, .slide_up=2, .grounded = false};
+    Player player = {.speed=50, .rect = {.height = 16, .width = 8, .x = (screenWidth/2)-4, .y=(screenHeight/2)-8}, .state=0, .velocity={0}, .jump_force=-100, .gravity=130, .p_offset={0}, .slide_up=2, .grounded = false};
     player.facing = RIGHT;
 
     CalculateSize(&player, 8, 15);
@@ -105,7 +109,7 @@ int main()
         {
             tick_counter = 0;
 
-            if (tick_tracker %4)
+            if (tick_tracker%horizontal_ticks)
             {
                 if (rand()%2)
                 {
@@ -154,7 +158,7 @@ int main()
         }
         if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
         { 
-            ChangeTile(world, selected_tile_index, FLUID, (Color){ 0, 121, 200+rand()%55,  100 + rand()%100 });
+            ChangeTile(world, selected_tile_index, FLUID, (Color){100 +rand()%20, 121, 200+rand()%10, 200+rand()%20});
             //printf("%i\n", GetTileState(world, selected_tile_index.x, selected_tile_index.y));
         }
         if (IsMouseButtonDown(MOUSE_MIDDLE_BUTTON))
@@ -211,9 +215,11 @@ int main()
         EndTextureMode();
 
         BeginDrawing();
+            BeginShaderMode(default_shader);
 
             DrawTexturePro(screen.texture, (Rectangle){.x=0, .y=0, .width=screenWidth, .height=-screenHeight}, (Rectangle){.x=0, .y=0, .width=winWidth, .height=winHeight}, (Vector2){.x = 0, .y = 0}, 0.0f, WHITE);
 
+            EndShaderMode();
         EndDrawing();
     }
 
