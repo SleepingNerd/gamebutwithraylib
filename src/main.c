@@ -205,7 +205,10 @@ int main()
 
             DrawTextureRec(test_anim.frame_arr[anim_m_test.frame],player_img_rect, offset, WHITE);
 
+            BeginShaderMode(default_shader);
+
             DrawWorld(world, camera.p_offset, (Vector2i){.x = screenWidth, .y=screenHeight}, screen);
+            EndShaderMode();
 
             
             DrawFPS(10, 10);
@@ -215,11 +218,9 @@ int main()
         EndTextureMode();
 
         BeginDrawing();
-            BeginShaderMode(default_shader);
-
             DrawTexturePro(screen.texture, (Rectangle){.x=0, .y=0, .width=screenWidth, .height=-screenHeight}, (Rectangle){.x=0, .y=0, .width=winWidth, .height=winHeight}, (Vector2){.x = 0, .y = 0}, 0.0f, WHITE);
 
-            EndShaderMode();
+
         EndDrawing();
     }
 
