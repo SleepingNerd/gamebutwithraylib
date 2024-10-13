@@ -502,10 +502,7 @@ void SimulateWorldVariantThree(Map world)
                     for(int x = world.inner_subchunks_topleft[j].x; x<(right); x++)
                     {
                         int index = y*world.chunk_size.x+x;
-                        if (world.beany_chunks[i]->moved[index])
-                        {
-                            continue;
-                        }
+                      
                   
 
 

@@ -28,8 +28,8 @@ int main()
     int winHeight = 360;
 
     // Any screen dimension is not allowed to be any larger than (the chunk dimension - 2
-    int screenWidth = 640;
-    int screenHeight = 360;
+    int screenWidth = 320;
+    int screenHeight = 180;
    
 
     InitWindow(winWidth, winHeight, "Best game I've ever seen");
@@ -163,7 +163,11 @@ int main()
         }
         if (IsMouseButtonDown(MOUSE_MIDDLE_BUTTON))
         {
-            printf("%i\n", GetTileState(world, selected_tile_index.x, selected_tile_index.y));
+            tick_speed = 1;
+        }
+        else
+        {
+            tick_speed= 0.004;
         }
 
         

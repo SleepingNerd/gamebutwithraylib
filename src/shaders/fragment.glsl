@@ -38,7 +38,7 @@ void main()
     vec3 edge = sqrt((horizEdge.rgb*horizEdge.rgb) + (vertEdge.rgb*vertEdge.rgb));
 
     vec4 goColor = texture2D(texture0, fragTexCoord);
-    if (edge.b > 0.8) 
+    if (edge.b > 0.5 && edge.b < 0.8) 
     {
         goColor= vec4(0.0, 0.5, 1.0, 1.0);
     }
