@@ -30,6 +30,7 @@ int main()
     // Any screen dimension is not allowed to be any larger than (the chunk dimension - 2
     int screenWidth = 320;
     int screenHeight = 180;
+    bool fullscreen = false;
    
 
     InitWindow(winWidth, winHeight, "Best game I've ever seen");
@@ -91,12 +92,13 @@ int main()
     Map world = GenerateEmptyWorld((Vector2i){.x = 512, .y = 512}, (Vector2i){.x = 4096, .y =4096}, (Vector2i){.x = 8, .y = 8}); // 64 by 64 subchunks
     if (world.beany_chunks == NULL)
     {
-            printf("\nWhy me????\n");
+            printf("\nWhyyy\n");
     }
     Image test_img = {.data = calloc(world.chunk_size.y, world.chunk_size.x*sizeof(Color)), .format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8, .height = world.chunk_size.y, .width=world.chunk_size.x, .mipmaps = 1};
 
     chunk_texture = LoadTextureFromImage(test_img);
-    //SetTextureWrap(chunk_texture, 100);                                                  // Set texture wrapping mode
+    //SetTextureWrap(chunk_texture, 100);          
+    int fr = 0;                                        // Set texture wrapping mode
 
 
     while(!WindowShouldClose())
@@ -109,6 +111,8 @@ int main()
         {
             tick_counter = 0;
 
+            SimulateWorld(world);
+            /*
             if (tick_tracker%horizontal_ticks)
             {
                 if (rand()%2)
@@ -129,7 +133,7 @@ int main()
                 SimulateWorldVariant(world);
             }
 
-            tick_tracker+=1;
+            tick_tracker+=1;*/
         }
 
 
@@ -153,7 +157,8 @@ int main()
 
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
         {
-         
+            printf("%i\n", fr);
+            fr+=1;
             ChangeTile(world, selected_tile_index, SOLID, ORANGE);
         }
         if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
@@ -175,17 +180,20 @@ int main()
 
         if (IsKeyPressed(KEY_SPACE))
         {
-            ToggleFullscreen();
-            if (IsWindowFullscreen())
-            {
-                winHeight = GetMonitorHeight(GetCurrentMonitor());
-                winWidth = GetMonitorWidth(GetCurrentMonitor());
-                printf("%i, %i", winHeight, winWidth);
-            }
-            else
+            if (fullscreen)
             {
                 winWidth = screenWidth;
                 winHeight = screenHeight;
+                fullscreen = false;
+                
+            }
+            else
+            {
+                winHeight = GetMonitorHeight(GetCurrentMonitor());
+                winWidth = GetMonitorWidth(GetCurrentMonitor());
+
+                SetWindowSize(winWidth, winHeight);
+                SetWindowPosition(0,0);
             }
         }
 
@@ -202,22 +210,16 @@ int main()
             ClearBackground(WHITE);
             // I store textures with (0,0) as top-left, 
             // This is why I have to flip the y
-
-
             player_img_rect.width= fabs(player_img_rect.width)*player.facing;
             Vector2 offset = {.x = (int)(player.rect.x)-(int)camera.offset.x, .y= (int)(player.rect.y)-(int)camera.offset.y};
 
             DrawTextureRec(test_anim.frame_arr[anim_m_test.frame],player_img_rect, offset, WHITE);
 
-            BeginShaderMode(default_shader);
+            //BeginShaderMode(default_shader);
 
             DrawWorld(world, camera.p_offset, (Vector2i){.x = screenWidth, .y=screenHeight}, screen);
             EndShaderMode();
-
-            
             DrawFPS(10, 10);
-
-
 
         EndTextureMode();
 
