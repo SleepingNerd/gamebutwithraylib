@@ -13,6 +13,8 @@ Texture2D textures[TILES] = {0};
 
 extern Texture chunk_texture;
 
+
+
 void LoadTileTextures()
 {
     char tiles_folder[] = "assets/tiles/";
@@ -48,7 +50,7 @@ Map GenerateEmptyWorld(Vector2i chunk_size, Vector2i chunk_count, Vector2i subch
     }
     Vector2i subchunk_count = (Vector2i){.x=chunk_size.x/subchunk_size.x, .y=chunk_size.y/subchunk_size.y}; // ngl only reason I  even declared this was cause I didn't want to allocate memory out of the fancy struct declaration
 
-    Map m = {.chunk_size = chunk_size, .chunks = calloc(chunk_count.x*chunk_count.y, sizeof(Chunk*)), .chunk_count=chunk_count, .beany_chunks = calloc(20, sizeof(Chunk*)), .subchunk_size = subchunk_size, 
+    Map m = {.chunk_size = chunk_size, .chunks = calloc(chunk_count.x*chunk_count.y, sizeof(Chunk*)), .chunk_count=chunk_count, .beany_chunks = calloc(20, sizeof(FullWorldIndex)), .subchunk_size = subchunk_size, 
     .subchunk_count = subchunk_count,
     // We reallocate the proper amount later
     .inner_subchunks_length = 0, .outer_subchunks_length = 0, 
@@ -139,13 +141,13 @@ Chunk *GenerateEmptyChunk(Vector2i chunk_size, Vector2i subchunk_size)
 
     return c;
 }
-
-inline FullWorldIndex GeneralAccess(Map w, int x, int y)
+/*
+inline FullWorldIndex GeneralAccess(Map w, int i)
 {
     printf("temp?");
-}
+}*/
 
-inline FullWorldIndex GeneralAccessXY(Map world, int x, int y)
+FullWorldIndex GeneralAccessXY(Map world, int x, int y)
 {
     Vector2i tile_in_chunk = {x%world.chunk_size.x, .y=y%world.chunk_size.y};
     Vector2i chunk = {.x=x/world.chunk_size.x, .y=y/world.chunk_size.y};
@@ -156,14 +158,12 @@ inline FullWorldIndex GeneralAccessXY(Map world, int x, int y)
 
 
 
-void AddActiveChunk(Map w, Chunk* chunk_p)
+void AddActiveChunk(Map w, FullWorldIndex chunk_i)
 {
-
-
     int i;
     for(i = 0; i<20; i++)
     {
-        if (w.beany_chunks[i]==chunk_p)
+        if (w.beany_chunks[i].in_chunk!=0 && w.beany_chunks[i].chunk==chunk_i.chunk)
         {
             return;
         }
@@ -171,9 +171,9 @@ void AddActiveChunk(Map w, Chunk* chunk_p)
 
     for(i = 0; i<20; i++)
     {
-        if (w.beany_chunks[i]==NULL)
+        if (w.beany_chunks[i].in_chunk==0)
         {
-            w.beany_chunks[i] = chunk_p;
+            w.beany_chunks[i] = chunk_i;
             return;
         }
     }
@@ -215,8 +215,9 @@ void ChangeTile(Map world, Vector2i position, TileState tile_state, Color color)
             if (tile_state != SOLID)
             {
                 world.chunks[chunk.x+chunk.y*world.chunk_count.x]->subchunks[tile_in_chunk.x-(tile_in_chunk.x%world.subchunk_size.x) + (tile_in_chunk.y-(tile_in_chunk.y%world.subchunk_size.y))*world.subchunk_size.x] = 1;
-                AddActiveChunk(world, world.chunks[chunk.x+chunk.y*world.chunk_count.x]);
-                
+                //AddActiveChunk(world, world.chunks[chunk.x+chunk.y*world.chunk_count.x]);
+                AddActiveChunk(world, (FullWorldIndex){.chunk=chunk.x+chunk.y*world.chunk_count.x,.chunk_pos.x = chunk.x, .chunk_pos.y=chunk.y, .in_chunk=1, .in_chunk_pos={0}});
+
             }
          
         }
@@ -266,10 +267,12 @@ void SimulateWorld(Map world)
 {
     for (int i = 0; i<20; i++)
     {
-        if (world.beany_chunks[i] != NULL)
+        Chunk *chunk_pointer = world.chunks[world.beany_chunks[i].chunk];
+
+        if (world.beany_chunks[i].in_chunk != 0)
         {
 
-            memset(world.beany_chunks[i]->moved, 0, world.chunk_size.y*world.chunk_size.x);
+            memset(chunk_pointer->moved, 0, world.chunk_size.y*world.chunk_size.x);
             
             for (int j = 0; j<world.inner_subchunks_length; j++)
             {             
@@ -287,82 +290,81 @@ void SimulateWorld(Map world)
                     for(int x = right-1; x>=world.inner_subchunks_topleft[j].x; x--)
                     {
                         int index = y*world.chunk_size.x+x;
-                        if (world.beany_chunks[i]->moved[index])
+                        if (chunk_pointer->moved[index])
                         {
                             continue;
                         }
                   
 
 
-                        if (world.beany_chunks[i]->tiles[index]==FLUID)
+                        if (chunk_pointer->tiles[index]==FLUID)
                         {
 
-                            if ((world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x]<2))
+                            if ((chunk_pointer->tiles[(y+1)*world.chunk_size.x+x]<2))
                             {
                                 //printf("I am deeply saad once agin");
                                 //printf("%i\n", SOLID);
-                                //printf("%i the under\n", world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x]);
-                                world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x] = FLUID;
-                                world.beany_chunks[i]->colors[(y+1)*world.chunk_size.x+x] = world.beany_chunks[i]->colors[y*world.chunk_size.x+x];
-                                world.beany_chunks[i]->moved[(y+1)*world.chunk_size.x+x] = 1;
+                                //printf("%i the under\n", chunk_pointer->tiles[(y+1)*world.chunk_size.x+x]);
+                                chunk_pointer->tiles[(y+1)*world.chunk_size.x+x] = FLUID;
+                                chunk_pointer->colors[(y+1)*world.chunk_size.x+x] = chunk_pointer->colors[y*world.chunk_size.x+x];
+                                chunk_pointer->moved[(y+1)*world.chunk_size.x+x] = 1;
 
-                                world.beany_chunks[i]->tiles[y*world.chunk_size.x+x] = VOID;
-                                world.beany_chunks[i]->colors[y*world.chunk_size.x+x] = BLANK;
-                                world.beany_chunks[i]->moved[y*world.chunk_size.x+x] = 0;
+                                chunk_pointer->tiles[y*world.chunk_size.x+x] = VOID;
+                                chunk_pointer->colors[y*world.chunk_size.x+x] = BLANK;
+                                chunk_pointer->moved[y*world.chunk_size.x+x] = 0;
 
 
                             }
-
-                             else if (world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x+1]<2)
+                             else if (chunk_pointer->tiles[(y+1)*world.chunk_size.x+x+1]<2)
                             {
 
                                 //printf("%i\n", SOLID);
-                                //printf("%i the under\n", world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x]);
-                                world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x+1] = FLUID;
-                                world.beany_chunks[i]->colors[(y+1)*world.chunk_size.x+x+1] = world.beany_chunks[i]->colors[y*world.chunk_size.x+x];
-                                world.beany_chunks[i]->moved[(y+1)*world.chunk_size.x+x+1] = 1;
+                                //printf("%i the under\n", chunk_pointer->tiles[(y+1)*world.chunk_size.x+x]);
+                                chunk_pointer->tiles[(y+1)*world.chunk_size.x+x+1] = FLUID;
+                                chunk_pointer->colors[(y+1)*world.chunk_size.x+x+1] = chunk_pointer->colors[y*world.chunk_size.x+x];
+                                chunk_pointer->moved[(y+1)*world.chunk_size.x+x+1] = 1;
 
-                                world.beany_chunks[i]->tiles[y*world.chunk_size.x+x] = VOID;
-                                world.beany_chunks[i]->colors[y*world.chunk_size.x+x] = BLANK;
-                                world.beany_chunks[i]->moved[y*world.chunk_size.x+x] = 0;
+                                chunk_pointer->tiles[y*world.chunk_size.x+x] = VOID;
+                                chunk_pointer->colors[y*world.chunk_size.x+x] = BLANK;
+                                chunk_pointer->moved[y*world.chunk_size.x+x] = 0;
 
 
                             }
-                            else if (world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x-1]<2)
+                            else if (chunk_pointer->tiles[(y+1)*world.chunk_size.x+x-1]<2)
                             {
 
                                 //printf("%i\n", SOLID);
-                                //printf("%i the under\n", world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x]);
-                                world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x-1] = FLUID;
-                                world.beany_chunks[i]->colors[(y+1)*world.chunk_size.x+x-1] = world.beany_chunks[i]->colors[y*world.chunk_size.x+x];
-                                world.beany_chunks[i]->moved[(y+1)*world.chunk_size.x+x-1] = 1;
+                                //printf("%i the under\n", chunk_pointer->tiles[(y+1)*world.chunk_size.x+x]);
+                                chunk_pointer->tiles[(y+1)*world.chunk_size.x+x-1] = FLUID;
+                                chunk_pointer->colors[(y+1)*world.chunk_size.x+x-1] = chunk_pointer->colors[y*world.chunk_size.x+x];
+                                chunk_pointer->moved[(y+1)*world.chunk_size.x+x-1] = 1;
 
-                                world.beany_chunks[i]->tiles[y*world.chunk_size.x+x] = VOID;
-                                world.beany_chunks[i]->colors[y*world.chunk_size.x+x] = BLANK;
-                                world.beany_chunks[i]->moved[y*world.chunk_size.x+x] = 0;
+                                chunk_pointer->tiles[y*world.chunk_size.x+x] = VOID;
+                                chunk_pointer->colors[y*world.chunk_size.x+x] = BLANK;
+                                chunk_pointer->moved[y*world.chunk_size.x+x] = 0;
 
                             }
 
-                            else if (world.beany_chunks[i]->tiles[y*world.chunk_size.x+x+1]<2)
+                            else if (chunk_pointer->tiles[y*world.chunk_size.x+x+1]<2)
                             {
-                                world.beany_chunks[i]->tiles[y*world.chunk_size.x+x+1] = FLUID;
-                                world.beany_chunks[i]->colors[y*world.chunk_size.x+x+1] = world.beany_chunks[i]->colors[y*world.chunk_size.x+x];
-                                world.beany_chunks[i]->moved[y*world.chunk_size.x+x+1] = 1;
+                                chunk_pointer->tiles[y*world.chunk_size.x+x+1] = FLUID;
+                                chunk_pointer->colors[y*world.chunk_size.x+x+1] = chunk_pointer->colors[y*world.chunk_size.x+x];
+                                chunk_pointer->moved[y*world.chunk_size.x+x+1] = 1;
 
-                                world.beany_chunks[i]->tiles[y*world.chunk_size.x+x] = VOID;
-                                world.beany_chunks[i]->colors[y*world.chunk_size.x+x] = BLANK;
-                                world.beany_chunks[i]->moved[y*world.chunk_size.x+x] = 0;
+                                chunk_pointer->tiles[y*world.chunk_size.x+x] = VOID;
+                                chunk_pointer->colors[y*world.chunk_size.x+x] = BLANK;
+                                chunk_pointer->moved[y*world.chunk_size.x+x] = 0;
                             }
 
-                            else if (world.beany_chunks[i]->tiles[y*world.chunk_size.x+x-1]<2)
+                            else if (chunk_pointer->tiles[y*world.chunk_size.x+x-1]<2)
                             {
-                                world.beany_chunks[i]->tiles[y*world.chunk_size.x+x-1] = FLUID;
-                                world.beany_chunks[i]->colors[y*world.chunk_size.x+x-1] = world.beany_chunks[i]->colors[y*world.chunk_size.x+x];
-                                world.beany_chunks[i]->moved[y*world.chunk_size.x+x-1] = 1;
+                                chunk_pointer->tiles[y*world.chunk_size.x+x-1] = FLUID;
+                                chunk_pointer->colors[y*world.chunk_size.x+x-1] = chunk_pointer->colors[y*world.chunk_size.x+x];
+                                chunk_pointer->moved[y*world.chunk_size.x+x-1] = 1;
 
-                                world.beany_chunks[i]->tiles[y*world.chunk_size.x+x] = VOID;
-                                world.beany_chunks[i]->colors[y*world.chunk_size.x+x] = BLANK;
-                                world.beany_chunks[i]->moved[y*world.chunk_size.x+x] = 0;
+                                chunk_pointer->tiles[y*world.chunk_size.x+x] = VOID;
+                                chunk_pointer->colors[y*world.chunk_size.x+x] = BLANK;
+                                chunk_pointer->moved[y*world.chunk_size.x+x] = 0;
                             }
 
                            
@@ -370,97 +372,112 @@ void SimulateWorld(Map world)
                     }
                 }
             }
-
-            for (int i = 0; i<world.inner_subchunks_length; i++)
+            
+            for (int j = 0; j<world.outer_subchunks_length; j++)
             {
                 // Technically both 1 over the border
-                int right = world.inner_subchunks_topleft[j].x+world.subchunk_size.x;
-                int bottom = world.inner_subchunks_topleft[j].y+world.subchunk_size.y;
+                //printf("...");
+                int left =  world.outer_subchunks_topleft[j].x + world.beany_chunks[i].chunk_pos.x*world.chunk_size.x;
+                int top =   world.outer_subchunks_topleft[j].y +world.beany_chunks[i].chunk_pos.y*world.chunk_size.y;
 
-                //for(int y = bottom-1; y>=world.inner_subchunks_topleft[j].y; y--)
+                int right = left+world.subchunk_size.x;
+                int bottom = bottom+world.subchunk_size.y;
+                //printf("...ees");
 
+                //for(int y = bottom-1; y>=world.outer_subchunks_topleft[j].y; y--)
                 
-                for(int y = bottom-1; y>=world.inner_subchunks_topleft[j].y; y--)
+                for(int y = bottom-1; y>=left; y--)
                 {
-                    for(int x = right-1; x>=world.inner_subchunks_topleft[j].x; x--)
+                    
+                    for(int x = right-1; x>=top; x--)
                     {
                         int index = y*world.chunk_size.x+x;
-                        if (world.beany_chunks[i]->moved[index])
+                        if (world.chunks[i]->moved[index])
                         {
                             continue;
                         }
-                  
-                        FullWorldIndex wi = GeneralAccess(x, y);
 
-                        if (world.beany_chunks[i]->tiles[index]==FLUID)
+                        printf("voor");
+                        FullWorldIndex wi = GeneralAccessXY(world, x, y);
+                        FullWorldIndex wi_under = GeneralAccessXY(world, x, y+1);
+                        FullWorldIndex wi_under_right=  GeneralAccessXY(world, x+1, y+1);
+                        FullWorldIndex wi_under_left=  GeneralAccessXY(world, x-1, y+1);
+
+                        FullWorldIndex wi_up = GeneralAccessXY(world, x, y+1);
+                        
+                        FullWorldIndex wi_right = GeneralAccessXY(world, x, y+1);
+                        FullWorldIndex wi_left = GeneralAccessXY(world, x, y+1);
+
+                        printf("%i, %i", wi.chunk, wi.in_chunk);
+                        if (world.chunks[wi.chunk]->tiles[wi.in_chunk]==FLUID)
                         {
 
-                            if ((world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x]<2))
+                            if ((world.chunks[wi_under.chunk]->tiles[wi_under.in_chunk]<2))
                             {
-                                //printf("I am deeply saad once agin");
+                                printf("I am deeply saad once agin");
                                 //printf("%i\n", SOLID);
-                                //printf("%i the under\n", world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x]);
-                                world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x] = FLUID;
-                                world.beany_chunks[i]->colors[(y+1)*world.chunk_size.x+x] = world.beany_chunks[i]->colors[y*world.chunk_size.x+x];
-                                world.beany_chunks[i]->moved[(y+1)*world.chunk_size.x+x] = 1;
+                                //printf("%i the under\n", world.chunks[i]->tiles[(y+1)*world.chunk_size.x+x]);
+                                world.chunks[wi_under.chunk]->tiles[wi_under.in_chunk] = FLUID;
+                                world.chunks[wi_under.chunk]->colors[wi_under.in_chunk] = world.chunks[wi.chunk]->colors[wi.in_chunk];
+                                world.chunks[wi_under.chunk]->moved[wi_under.in_chunk] = 1;
 
-                                world.beany_chunks[i]->tiles[y*world.chunk_size.x+x] = VOID;
-                                world.beany_chunks[i]->colors[y*world.chunk_size.x+x] = BLANK;
-                                world.beany_chunks[i]->moved[y*world.chunk_size.x+x] = 0;
+                                world.chunks[wi.chunk]->tiles[wi.in_chunk] = VOID;
+                                world.chunks[wi.chunk]->colors[wi.in_chunk] = BLANK;
+                                world.chunks[wi.chunk]->moved[wi.in_chunk] = 0;
 
 
                             }
 
-                             else if (world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x+1]<2)
-                            {
-
-                                //printf("%i\n", SOLID);
-                                //printf("%i the under\n", world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x]);
-                                world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x+1] = FLUID;
-                                world.beany_chunks[i]->colors[(y+1)*world.chunk_size.x+x+1] = world.beany_chunks[i]->colors[y*world.chunk_size.x+x];
-                                world.beany_chunks[i]->moved[(y+1)*world.chunk_size.x+x+1] = 1;
-
-                                world.beany_chunks[i]->tiles[y*world.chunk_size.x+x] = VOID;
-                                world.beany_chunks[i]->colors[y*world.chunk_size.x+x] = BLANK;
-                                world.beany_chunks[i]->moved[y*world.chunk_size.x+x] = 0;
-
-
-                            }
-                            else if (world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x-1]<2)
+                            else if (world.chunks[wi_under_right.chunk]->tiles[wi_under_right.in_chunk]<2)
                             {
 
                                 //printf("%i\n", SOLID);
-                                //printf("%i the under\n", world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x]);
-                                world.beany_chunks[i]->tiles[(y+1)*world.chunk_size.x+x-1] = FLUID;
-                                world.beany_chunks[i]->colors[(y+1)*world.chunk_size.x+x-1] = world.beany_chunks[i]->colors[y*world.chunk_size.x+x];
-                                world.beany_chunks[i]->moved[(y+1)*world.chunk_size.x+x-1] = 1;
+                                //printf("%i the under\n", world.chunks[wi.chunk]->tiles[(y+1)*world.chunk_size.x+x]);
+                                world.chunks[wi_under_right.chunk]->tiles[wi_under_right.in_chunk] = FLUID;
+                                world.chunks[wi_under_right.chunk]->colors[wi_under_right.in_chunk] = world.chunks[wi.chunk]->colors[wi.in_chunk];
+                                world.chunks[wi_under_right.chunk]->moved[wi_under_right.in_chunk] = 1;
 
-                                world.beany_chunks[i]->tiles[y*world.chunk_size.x+x] = VOID;
-                                world.beany_chunks[i]->colors[y*world.chunk_size.x+x] = BLANK;
-                                world.beany_chunks[i]->moved[y*world.chunk_size.x+x] = 0;
+                                world.chunks[wi.chunk]->tiles[wi.in_chunk] = VOID;
+                                world.chunks[wi.chunk]->colors[wi.in_chunk] = BLANK;
+                                world.chunks[wi.chunk]->moved[wi.in_chunk] = 0;
+
+
+                            }
+                            else if (world.chunks[wi_under_left.chunk]->tiles[wi_under_left.in_chunk]<2)
+                            {
+
+                                //printf("%i\n", SOLID);
+                                //printf("%i the under\n", world.chunks[wi.chunk]->tiles[(y+1)*world.chunk_size.x+x]);
+                                world.chunks[wi_under_left.in_chunk]->tiles[wi_under_left.in_chunk] = FLUID;
+                                world.chunks[wi_under_left.in_chunk]->colors[wi_under_left.in_chunk] = world.chunks[wi.chunk]->colors[wi.in_chunk];
+                                world.chunks[wi_under_left.in_chunk]->moved[wi_under_left.in_chunk] = 1;
+
+                                world.chunks[wi.chunk]->tiles[wi.in_chunk] = VOID;
+                                world.chunks[wi.chunk]->colors[wi.in_chunk] = BLANK;
+                                world.chunks[wi.chunk]->moved[wi.in_chunk] = 0;
 
                             }
 
-                            else if (world.beany_chunks[i]->tiles[y*world.chunk_size.x+x+1]<2)
+                            else if (world.chunks[wi_right.chunk]->tiles[wi_right.in_chunk+1]<2)
                             {
-                                world.beany_chunks[i]->tiles[y*world.chunk_size.x+x+1] = FLUID;
-                                world.beany_chunks[i]->colors[y*world.chunk_size.x+x+1] = world.beany_chunks[i]->colors[y*world.chunk_size.x+x];
-                                world.beany_chunks[i]->moved[y*world.chunk_size.x+x+1] = 1;
+                                world.chunks[wi_right.chunk]->tiles[wi_right.in_chunk] = FLUID;
+                                world.chunks[wi_right.chunk]->colors[wi_right.in_chunk] = world.chunks[wi.chunk]->colors[wi.in_chunk];
+                                world.chunks[wi_right.chunk]->moved[wi_right.in_chunk] = 1;
 
-                                world.beany_chunks[i]->tiles[y*world.chunk_size.x+x] = VOID;
-                                world.beany_chunks[i]->colors[y*world.chunk_size.x+x] = BLANK;
-                                world.beany_chunks[i]->moved[y*world.chunk_size.x+x] = 0;
+                                world.chunks[wi.chunk]->tiles[wi.in_chunk] = VOID;
+                                world.chunks[wi.chunk]->colors[wi.in_chunk] = BLANK;
+                                world.chunks[wi.chunk]->moved[wi.in_chunk] = 0;
                             }
 
-                            else if (world.beany_chunks[i]->tiles[y*world.chunk_size.x+x-1]<2)
+                            else if (world.chunks[wi_left.chunk]->tiles[wi_left.in_chunk]<2)
                             {
-                                world.beany_chunks[i]->tiles[y*world.chunk_size.x+x-1] = FLUID;
-                                world.beany_chunks[i]->colors[y*world.chunk_size.x+x-1] = world.beany_chunks[i]->colors[y*world.chunk_size.x+x];
-                                world.beany_chunks[i]->moved[y*world.chunk_size.x+x-1] = 1;
+                                world.chunks[wi_left.chunk]->tiles[wi_left.in_chunk] = FLUID;
+                                world.chunks[wi_left.chunk]->colors[wi_left.in_chunk] = world.chunks[wi.chunk]->colors[wi.in_chunk];
+                                world.chunks[wi_left.chunk]->moved[wi_left.in_chunk] = 1;
 
-                                world.beany_chunks[i]->tiles[y*world.chunk_size.x+x] = VOID;
-                                world.beany_chunks[i]->colors[y*world.chunk_size.x+x] = BLANK;
-                                world.beany_chunks[i]->moved[y*world.chunk_size.x+x] = 0;
+                                world.chunks[wi.chunk]->tiles[wi.in_chunk] = VOID;
+                                world.chunks[wi.chunk]->colors[wi.in_chunk] = BLANK;
+                                world.chunks[wi.chunk]->moved[wi.in_chunk] = 0;
                             }
 
                            
@@ -468,7 +485,7 @@ void SimulateWorld(Map world)
                     }
                 }
             }
-            }
+            
             
 
             
@@ -477,7 +494,7 @@ void SimulateWorld(Map world)
         }
     }
 }
-
+/*f
 void SimulateWorldVariant(Map world)
 {
     for (int i = 0; i<20; i++)
@@ -494,6 +511,7 @@ void SimulateWorldVariant(Map world)
                 // Technically both 1 over the border
                 int right = world.inner_subchunks_topleft[j].x+world.subchunk_size.x;
                 int bottom = world.inner_subchunks_topleft[j].y+world.subchunk_size.y;
+
 
                 //for(int y = bottom-1; y>=world.inner_subchunks_topleft[j].y; y--)
 
@@ -732,8 +750,7 @@ void SimulateWorldVariantFour(Map world)
         
         }
     }
-}
-
+}*/
 
 
    

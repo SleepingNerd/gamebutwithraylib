@@ -37,12 +37,13 @@ typedef enum {
 
 typedef struct Chunk{
     TileState *tiles;
-
     Image image;
     Color *colors;
     char *moved;
     char *subchunks; // keeps track of which subchunks are active
 } Chunk;
+
+
 
 typedef struct WorldIndex{
     int in_chunk;
@@ -86,7 +87,7 @@ typedef struct Map{
 
 
     Chunk **chunks;
-    Chunk **beany_chunks;
+    FullWorldIndex *beany_chunks;
 } Map; 
 
 // Should be noted that the top left of the world corresponds to arr[0][0]
@@ -115,6 +116,8 @@ void RenderWorld(World world, Vector2i world_size);
 void EmptyWorld(World *world, Vector2i size);
 void ChangeTile(Map world, Vector2i position, TileState tile_state, Color color);
 TileState GetTileState(Map world, int x, int y);
+FullWorldIndex GeneralAccessXY(Map world, int x, int y);
+
 
 void DrawWorld(Map world, Vector2i offset, Vector2i size, RenderTexture2D target);
 
@@ -131,8 +134,7 @@ void SimulateWorldVariantFour(Map world);
 
 
 
-void AddActiveChunk(Map world, Chunk* chunk_p);
-
+void AddActiveChunk(Map w, FullWorldIndex chunk_i);
 // io
 void SaveWorld(World world, char *path);
 

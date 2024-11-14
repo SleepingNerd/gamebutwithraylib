@@ -20,7 +20,7 @@ Texture chunk_texture;
 
 int main()
 {
-    float tick_speed =  0.004;
+    float tick_speed =  0.1;
     int tick_tracker = 0;
     float tick_counter = 0;
     int horizontal_ticks = 2;
@@ -157,7 +157,7 @@ int main()
 
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
         {
-            printf("%i\n", fr);
+           // printf("%i\n", fr);
             fr+=1;
             ChangeTile(world, selected_tile_index, SOLID, ORANGE);
         }
@@ -218,6 +218,16 @@ int main()
             //BeginShaderMode(default_shader);
 
             DrawWorld(world, camera.p_offset, (Vector2i){.x = screenWidth, .y=screenHeight}, screen);
+                            
+            //DrawLine(0, camera.p_offset.y%world.chunk_size.y,screenWidth,camera.p_offset.y%world.chunk_size.y,BLACK);
+
+            for (int i = 0; i++; i<6)
+            {
+                int y = camera.p_offset.y+camera.p_offset.y%world.chunk_size.y-i*world.chunk_size.y;
+                DrawLine(0,y,screenWidth,y,BLACK);
+
+            }
+
             EndShaderMode();
             DrawFPS(10, 10);
 
