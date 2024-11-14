@@ -44,6 +44,19 @@ typedef struct Chunk{
     char *subchunks; // keeps track of which subchunks are active
 } Chunk;
 
+typedef struct WorldIndex{
+    int in_chunk;
+    int chunk;
+} WorldIndex;
+
+typedef struct FullWorldIndex{
+    int in_chunk;
+    int chunk;
+
+    Vector2i in_chunk_pos;
+    Vector2i chunk_pos;
+} FullWorldIndex;
+
 typedef struct World{
     Vector2i size;
     TileState *tiles;
