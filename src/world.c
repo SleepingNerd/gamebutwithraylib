@@ -277,7 +277,7 @@ void SimulateWorld(Map world)
             memset(chunk_pointer->moved, 0, world.chunk_size.y*world.chunk_size.x);
             
             for (int j = 0; j<world.inner_subchunks_length; j++)
-            {             
+            {
 
               
                 // Technically both 1 over the border
@@ -425,9 +425,6 @@ void SimulateWorld(Map world)
                         {
                             if ((world.chunks[wi_under.chunk]->tiles[wi_under.in_chunk]<2))
                             {
-                                //printf("I am deeply saad once agin");
-                                //printf("%i\n", SOLID);
-                                //printf("%i the under\n", world.chunks[i]->tiles[(y+1)*world.chunk_size.x+x]);
                                 world.chunks[wi_under.chunk]->tiles[wi_under.in_chunk] = FLUID;
                                 world.chunks[wi_under.chunk]->colors[wi_under.in_chunk] = world.chunks[wi.chunk]->colors[wi.in_chunk];
                                 world.chunks[wi_under.chunk]->moved[wi_under.in_chunk] = 1;
@@ -442,8 +439,6 @@ void SimulateWorld(Map world)
                             else if (world.chunks[wi_under_right.chunk]->tiles[wi_under_right.in_chunk]<2)
                             {
 
-                                //printf("%i\n", SOLID);
-                                //printf("%i the under\n", world.chunks[wi.chunk]->tiles[(y+1)*world.chunk_size.x+x]);
                                 world.chunks[wi_under_right.chunk]->tiles[wi_under_right.in_chunk] = FLUID;
                                 world.chunks[wi_under_right.chunk]->colors[wi_under_right.in_chunk] = world.chunks[wi.chunk]->colors[wi.in_chunk];
                                 world.chunks[wi_under_right.chunk]->moved[wi_under_right.in_chunk] = 1;
@@ -458,8 +453,6 @@ void SimulateWorld(Map world)
                             else if (world.chunks[wi_under_left.chunk]->tiles[wi_under_left.in_chunk]<2)
                             {
 
-                                //printf("%i\n", SOLID);
-                                //printf("%i the under\n", world.chunks[wi.chunk]->tiles[(y+1)*world.chunk_size.x+x]);
                                 world.chunks[wi_under_left.chunk]->tiles[wi_under_left.in_chunk] = FLUID;
                                 world.chunks[wi_under_left.chunk]->colors[wi_under_left.in_chunk] = world.chunks[wi.chunk]->colors[wi.in_chunk];
                                 world.chunks[wi_under_left.chunk]->moved[wi_under_left.in_chunk] = 1;

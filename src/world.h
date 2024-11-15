@@ -80,7 +80,7 @@ typedef struct Map{
     int outer_subchunks_length;
 
 
-    // Both are in chunk
+    // Already regretting not putting this in a struct :) 
     Vector2i *inner_subchunks_topleft;
     Vector2i *outer_subchunks_topleft;
 
