@@ -149,10 +149,12 @@ inline FullWorldIndex GeneralAccess(Map w, int i)
 
 FullWorldIndex GeneralAccessXY(Map world, int x, int y)
 {
-    Vector2i tile_in_chunk = {x%world.chunk_size.x, .y=y%world.chunk_size.y};
-    Vector2i chunk = {.x=x/world.chunk_size.x, .y=y/world.chunk_size.y};
+    Vector2i tile_in_chunk = {.x=x%world.chunk_size.x, .y=y%world.chunk_size.y};
+    Vector2i chunkxy = {.x=x/world.chunk_size.x, .y=y/world.chunk_size.y};
 
-    return (FullWorldIndex){.chunk = x+y*world.chunk_count.x, .in_chunk=x+y*world.chunk_size.x, .in_chunk_pos=tile_in_chunk, .chunk_pos =chunk};
+    //printf("%i,%i\n", x,y);
+    //printv2i(chunkxy);
+    return (FullWorldIndex){.chunk = chunkxy.x+chunkxy.y*world.chunk_count.x, .in_chunk=tile_in_chunk.x+tile_in_chunk.y*world.chunk_size.x, .in_chunk_pos=tile_in_chunk, .chunk_pos =chunkxy};
 
 }
 
@@ -372,7 +374,7 @@ void SimulateWorld(Map world)
                     }
                 }
             }
-            
+            int a = 0;
             for (int j = 0; j<world.outer_subchunks_length; j++)
             {
                 // Technically both 1 over the border
@@ -381,40 +383,42 @@ void SimulateWorld(Map world)
                 int top =   world.outer_subchunks_topleft[j].y +world.beany_chunks[i].chunk_pos.y*world.chunk_size.y;
 
                 int right = left+world.subchunk_size.x;
-                int bottom = bottom+world.subchunk_size.y;
+                int bottom = top+world.subchunk_size.y;
                 //printf("...ees");
 
                 //for(int y = bottom-1; y>=world.outer_subchunks_topleft[j].y; y--)
-                
-                for(int y = bottom-1; y>=left; y--)
+                //printf("...");
+                for(int y = bottom-1; y>=top; y--)
                 {
                     
-                    for(int x = right-1; x>=top; x--)
+                    for(int x = right-1; x>=left; x--)
                     {
+                        FullWorldIndex wi = GeneralAccessXY(world, x, y);
                         int index = y*world.chunk_size.x+x;
-                        if (world.chunks[i]->moved[index])
+
+
+                      
+                        if (world.chunks[wi.chunk]->moved[wi.in_chunk])
                         {
+                            //printf("contin");
                             continue;
                         }
 
-                        printf("voor");
-                        FullWorldIndex wi = GeneralAccessXY(world, x, y);
                         FullWorldIndex wi_under = GeneralAccessXY(world, x, y+1);
                         FullWorldIndex wi_under_right=  GeneralAccessXY(world, x+1, y+1);
                         FullWorldIndex wi_under_left=  GeneralAccessXY(world, x-1, y+1);
 
                         FullWorldIndex wi_up = GeneralAccessXY(world, x, y+1);
                         
-                        FullWorldIndex wi_right = GeneralAccessXY(world, x, y+1);
-                        FullWorldIndex wi_left = GeneralAccessXY(world, x, y+1);
+                        FullWorldIndex wi_right = GeneralAccessXY(world, x+1, y);
+                        FullWorldIndex wi_left = GeneralAccessXY(world, x-1, y);
 
-                        printf("%i, %i", wi.chunk, wi.in_chunk);
+                        //printf("%i, %i", wi.chunk, wi.in_chunk);
                         if (world.chunks[wi.chunk]->tiles[wi.in_chunk]==FLUID)
                         {
-
                             if ((world.chunks[wi_under.chunk]->tiles[wi_under.in_chunk]<2))
                             {
-                                printf("I am deeply saad once agin");
+                                //printf("I am deeply saad once agin");
                                 //printf("%i\n", SOLID);
                                 //printf("%i the under\n", world.chunks[i]->tiles[(y+1)*world.chunk_size.x+x]);
                                 world.chunks[wi_under.chunk]->tiles[wi_under.in_chunk] = FLUID;
@@ -426,8 +430,8 @@ void SimulateWorld(Map world)
                                 world.chunks[wi.chunk]->moved[wi.in_chunk] = 0;
 
 
-                            }
 
+                            }
                             else if (world.chunks[wi_under_right.chunk]->tiles[wi_under_right.in_chunk]<2)
                             {
 
@@ -442,15 +446,16 @@ void SimulateWorld(Map world)
                                 world.chunks[wi.chunk]->moved[wi.in_chunk] = 0;
 
 
-                            }
+                            }                            
+
                             else if (world.chunks[wi_under_left.chunk]->tiles[wi_under_left.in_chunk]<2)
                             {
 
                                 //printf("%i\n", SOLID);
                                 //printf("%i the under\n", world.chunks[wi.chunk]->tiles[(y+1)*world.chunk_size.x+x]);
-                                world.chunks[wi_under_left.in_chunk]->tiles[wi_under_left.in_chunk] = FLUID;
-                                world.chunks[wi_under_left.in_chunk]->colors[wi_under_left.in_chunk] = world.chunks[wi.chunk]->colors[wi.in_chunk];
-                                world.chunks[wi_under_left.in_chunk]->moved[wi_under_left.in_chunk] = 1;
+                                world.chunks[wi_under_left.chunk]->tiles[wi_under_left.in_chunk] = FLUID;
+                                world.chunks[wi_under_left.chunk]->colors[wi_under_left.in_chunk] = world.chunks[wi.chunk]->colors[wi.in_chunk];
+                                world.chunks[wi_under_left.chunk]->moved[wi_under_left.in_chunk] = 1;
 
                                 world.chunks[wi.chunk]->tiles[wi.in_chunk] = VOID;
                                 world.chunks[wi.chunk]->colors[wi.in_chunk] = BLANK;
@@ -484,13 +489,12 @@ void SimulateWorld(Map world)
                         }
                     }
                 }
+                //printf("godver wa nu weer\n");
+                //if (a){a=21/0;}
+
             }
             
-            
 
-            
-        
-        
         }
     }
 }

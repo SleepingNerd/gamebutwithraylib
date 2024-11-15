@@ -20,7 +20,7 @@ Texture chunk_texture;
 
 int main()
 {
-    float tick_speed =  0.1;
+    float tick_speed =  1.0;
     int tick_tracker = 0;
     float tick_counter = 0;
     int horizontal_ticks = 2;
@@ -30,6 +30,7 @@ int main()
     // Any screen dimension is not allowed to be any larger than (the chunk dimension - 2
     int screenWidth = 320;
     int screenHeight = 180;
+    Vector2 scaling_factor = {.x=(float)winWidth/(float)screenWidth,.y=(float)winHeight/(float)screenHeight};
     bool fullscreen = false;
    
 
@@ -57,14 +58,15 @@ int main()
     Image static_world_img = {.data = img_data, .format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8, .height = screenHeight, .width = screenWidth};
 
 
-    View camera = {0};
+    int temp = 2;
+    View camera = {.p_offset={.x=screenWidth*temp, .y=screenHeight*temp}, .offset = {.x=screenWidth*temp, .y=screenHeight*temp}};
 
     Animation test_anim = LoadAnimation("assets/player/player.png", 5, 0.3f);
     AnimationManager anim_m_test = {.frame = 0, .delta = 0};
 
     LoadTileTextures();
 
-    Player player = {.speed=50, .rect = {.height = 16, .width = 8, .x = (screenWidth/2)-4, .y=(screenHeight/2)-8}, .state=0, .velocity={0}, .jump_force=-100, .gravity=130, .p_offset={0}, .slide_up=2, .grounded = false};
+    Player player = {.speed=50, .rect = {.height = 16, .width = 8, .x = screenWidth*temp+ (screenWidth/2)-4, .y=screenHeight*temp+(screenHeight/2)-8}, .state=0, .velocity={0}, .jump_force=-100, .gravity=130, .p_offset={0}, .slide_up=2, .grounded = false};
     player.facing = RIGHT;
 
     CalculateSize(&player, 8, 15);
@@ -106,7 +108,7 @@ int main()
 
         delta_t = GetFrameTime(); 
         tick_counter += delta_t;
-        
+        printf("%f\n", tick_counter);
         if (tick_counter > tick_speed)
         {
             tick_counter = 0;
@@ -195,6 +197,7 @@ int main()
                 SetWindowSize(winWidth, winHeight);
                 SetWindowPosition(0,0);
             }
+            scaling_factor = (Vector2){.x=(float)winWidth/(float)screenWidth,.y=(float)winHeight/(float)screenHeight};
         }
 
         // Rendering stuff starts from here
@@ -219,14 +222,7 @@ int main()
 
             DrawWorld(world, camera.p_offset, (Vector2i){.x = screenWidth, .y=screenHeight}, screen);
                             
-            //DrawLine(0, camera.p_offset.y%world.chunk_size.y,screenWidth,camera.p_offset.y%world.chunk_size.y,BLACK);
-
-            for (int i = 0; i++; i<6)
-            {
-                int y = camera.p_offset.y+camera.p_offset.y%world.chunk_size.y-i*world.chunk_size.y;
-                DrawLine(0,y,screenWidth,y,BLACK);
-
-            }
+            
 
             EndShaderMode();
             DrawFPS(10, 10);
@@ -234,8 +230,28 @@ int main()
         EndTextureMode();
 
         BeginDrawing();
-            DrawTexturePro(screen.texture, (Rectangle){.x=0, .y=0, .width=screenWidth, .height=-screenHeight}, (Rectangle){.x=0, .y=0, .width=winWidth, .height=winHeight}, (Vector2){.x = 0, .y = 0}, 0.0f, WHITE);
 
+            
+            
+            DrawTexturePro(screen.texture, (Rectangle){.x=0, .y=0, .width=screenWidth, .height=-screenHeight}, (Rectangle){.x=0, .y=0, .width=winWidth, .height=winHeight}, (Vector2){.x = 0, .y = 0}, 0.0f, WHITE);
+            for (int i = 0; i<3; i++)
+            {
+                
+                int y = (-(camera.p_offset.y%world.chunk_size.y)+i*world.chunk_size.y);
+                //printf("Y: %i, %i, %i,                               %i\n", y, camera.p_offset.y, screenHeight, world.chunk_size.y);
+                y*=scaling_factor.y;
+                DrawLine(0,y,winWidth,y ,BLACK);
+
+            }
+              for (int i = 0; i<3; i++)
+            {
+                
+                int x = (-(camera.p_offset.x%world.chunk_size.x)+i*world.chunk_size.x);
+                //printf("Y: %i, %i, %i,                               %i\n", y, camera.p_offset.y, screenHeight, world.chunk_size.y);
+                x*=scaling_factor.x;
+                DrawLine(x,0,x,winHeight ,BLACK);
+
+            }
 
         EndDrawing();
     }
