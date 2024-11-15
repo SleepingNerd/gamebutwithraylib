@@ -20,7 +20,7 @@ Texture chunk_texture;
 
 int main()
 {
-    float tick_speed =  1.0;
+    float tick_speed =  0.01;
     int tick_tracker = 0;
     float tick_counter = 0;
     int horizontal_ticks = 2;
@@ -108,7 +108,7 @@ int main()
 
         delta_t = GetFrameTime(); 
         tick_counter += delta_t;
-        printf("%f\n", tick_counter);
+        //printf("%f\n", tick_counter);
         if (tick_counter > tick_speed)
         {
             tick_counter = 0;
@@ -168,17 +168,8 @@ int main()
             ChangeTile(world, selected_tile_index, FLUID, (Color){100 +rand()%20, 121, 200+rand()%10, 200+rand()%20});
             //printf("%i\n", GetTileState(world, selected_tile_index.x, selected_tile_index.y));
         }
-        if (IsMouseButtonDown(MOUSE_MIDDLE_BUTTON))
-        {
-            tick_speed = 1;
-        }
-        else
-        {
-            tick_speed= 0.004;
-        }
 
-        
-
+      
 
         if (IsKeyPressed(KEY_SPACE))
         {
