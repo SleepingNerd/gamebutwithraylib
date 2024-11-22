@@ -14,7 +14,6 @@ Texture2D textures[TILES] = {0};
 extern Texture chunk_texture;
 
 
-
 void LoadTileTextures()
 {
     char tiles_folder[] = "assets/tiles/";
@@ -39,7 +38,10 @@ void LoadTileTextures()
     }
 }
 
-
+void SwapACBuffers(Map w)
+{
+    memcpy(w.active_chunks2, w.active_chunks, w.active_chunks_len*sizeof(Chunk*));
+}
 
 Map GenerateEmptyWorld(Vector2i chunk_size, Vector2i chunk_count, Vector2i subchunk_size) // REMEMBER: some more nullchecks should be added
 {
@@ -50,17 +52,25 @@ Map GenerateEmptyWorld(Vector2i chunk_size, Vector2i chunk_count, Vector2i subch
     }
     Vector2i subchunk_count = (Vector2i){.x=chunk_size.x/subchunk_size.x, .y=chunk_size.y/subchunk_size.y}; // ngl only reason I  even declared this was cause I didn't want to allocate memory out of the fancy struct declaration
 
-    Map m = {.chunk_size = chunk_size, .chunks = calloc(chunk_count.x*chunk_count.y, sizeof(Chunk*)), .chunk_count=chunk_count, .beany_chunks = calloc(20, sizeof(FullWorldIndex)), .subchunk_size = subchunk_size, 
+   
+
+    Map m = {.chunk_size = chunk_size, .chunks = calloc(chunk_count.x*chunk_count.y, sizeof(Chunk*)), .chunk_count=chunk_count, 
+    .active_chunks = calloc(DEFAULT_ACTIVE_LEN, sizeof(FullWorldIndex)), .subchunk_size = subchunk_size, 
+    .active_chunks2 = calloc(DEFAULT_ACTIVE_LEN, sizeof(FullWorldIndex)),
     .subchunk_count = subchunk_count,
     // We reallocate the proper amount later
     .inner_subchunks_length = 0, .outer_subchunks_length = 0, 
     .inner_subchunks = calloc(subchunk_count.x*subchunk_count.y, sizeof(int)), .outer_subchunks = calloc(subchunk_count.x*subchunk_count.y, sizeof(int)), 
-    .inner_subchunks_topleft = calloc(subchunk_count.x*subchunk_count.y, sizeof(Vector2i)), .outer_subchunks_topleft = calloc(subchunk_count.x*subchunk_count.y, sizeof(Vector2i))
+    .inner_subchunks_topleft = calloc(subchunk_count.x*subchunk_count.y, sizeof(Vector2i)), .outer_subchunks_topleft = calloc(subchunk_count.x*subchunk_count.y, sizeof(Vector2i)),
+    .active_chunks_len = DEFAULT_ACTIVE_LEN
     };
     
    // printf("%i, %i", subchunk_count.x, subchunk_count.y);
     //printf("%i, %i\n", subchunk_size.x, subchunk_size.y);
+    if (subchunk_count.x==0||subchunk_count.y==0)
+    {
 
+    }
 
     for (int x = 0; x<subchunk_count.x; x++)
     {
@@ -104,7 +114,7 @@ Map GenerateEmptyWorld(Vector2i chunk_size, Vector2i chunk_count, Vector2i subch
     m.outer_subchunks = realloc(m.outer_subchunks, m.outer_subchunks_length*sizeof(int));
     m.outer_subchunks_topleft = realloc(m.outer_subchunks_topleft, m.outer_subchunks_length*sizeof(Vector2i));
     printf("...");
-    if (m.beany_chunks == NULL)
+    if (m.active_chunks == NULL)
     {
             printf("\nfpp^lpl\n");
     }
@@ -159,13 +169,18 @@ FullWorldIndex GeneralAccessXY(Map world, int x, int y)
 }
 
 
-
-void AddActiveChunk(Map w, FullWorldIndex chunk_i)
+void ActivateChunk(Map w, FullWorldIndex chunk_i)
 {
+
+    if (w.chunks[chunk_i.chunk]->is_active)
+    {
+        return;
+    }
+
     int i;
     for(i = 0; i<20; i++)
     {
-        if (w.beany_chunks[i].in_chunk!=0 && w.beany_chunks[i].chunk==chunk_i.chunk)
+        if (w.active_chunks[i].in_chunk!=0 && w.active_chunks[i].chunk==chunk_i.chunk)
         {
             return;
         }
@@ -173,13 +188,15 @@ void AddActiveChunk(Map w, FullWorldIndex chunk_i)
 
     for(i = 0; i<20; i++)
     {
-        if (w.beany_chunks[i].in_chunk==0)
+        if (w.active_chunks[i].in_chunk==0)
         {
-            w.beany_chunks[i] = chunk_i;
+            w.active_chunks[i] = chunk_i;
             return;
         }
     }
+    w.chunks[chunk_i.chunk]->is_active = true;
 }
+
 
 
 void ChangeTile(Map world, Vector2i position, TileState tile_state, Color color)
@@ -218,7 +235,7 @@ void ChangeTile(Map world, Vector2i position, TileState tile_state, Color color)
             {
                 world.chunks[chunk.x+chunk.y*world.chunk_count.x]->subchunks[tile_in_chunk.x-(tile_in_chunk.x%world.subchunk_size.x) + (tile_in_chunk.y-(tile_in_chunk.y%world.subchunk_size.y))*world.subchunk_size.x] = 1;
                 //AddActiveChunk(world, world.chunks[chunk.x+chunk.y*world.chunk_count.x]);
-                AddActiveChunk(world, (FullWorldIndex){.chunk=chunk.x+chunk.y*world.chunk_count.x,.chunk_pos.x = chunk.x, .chunk_pos.y=chunk.y, .in_chunk=1, .in_chunk_pos={0}});
+                ActivateChunk(world, (FullWorldIndex){.chunk=chunk.x+chunk.y*world.chunk_count.x,.chunk_pos.x = chunk.x, .chunk_pos.y=chunk.y, .in_chunk=1, .in_chunk_pos={0}});
 
             }
          
@@ -269,9 +286,9 @@ void SimulateWorld(Map world)
 {
     for (int i = 0; i<20; i++)
     {
-        Chunk *chunk_pointer = world.chunks[world.beany_chunks[i].chunk];
+        Chunk *chunk_pointer = world.chunks[world.active_chunks2[i].chunk];
 
-        if (world.beany_chunks[i].in_chunk != 0)
+        if (world.active_chunks2[i].in_chunk != 0)
         {
 
             memset(chunk_pointer->moved, 0, world.chunk_size.y*world.chunk_size.x);
@@ -307,6 +324,7 @@ void SimulateWorld(Map world)
                                 //printf("I am deeply saad once agin");
                                 //printf("%i\n", SOLID);
                                 //printf("%i the under\n", chunk_pointer->tiles[(y+1)*world.chunk_size.x+x]);
+                                
                                 chunk_pointer->tiles[(y+1)*world.chunk_size.x+x] = FLUID;
                                 chunk_pointer->colors[(y+1)*world.chunk_size.x+x] = chunk_pointer->colors[y*world.chunk_size.x+x];
                                 chunk_pointer->moved[(y+1)*world.chunk_size.x+x] = 1;
@@ -380,18 +398,19 @@ void SimulateWorld(Map world)
             {
                 // Technically both 1 over the border
                 //printf("...");
-                int left =  world.outer_subchunks_topleft[j].x + world.beany_chunks[i].chunk_pos.x*world.chunk_size.x;
-                int top =   world.outer_subchunks_topleft[j].y +world.beany_chunks[i].chunk_pos.y*world.chunk_size.y;
+                int left =  world.outer_subchunks_topleft[j].x + world.active_chunks2[i].chunk_pos.x*world.chunk_size.x;
+                int top =   world.outer_subchunks_topleft[j].y +world.active_chunks2[i].chunk_pos.y*world.chunk_size.y;
 
                 int right = left+world.subchunk_size.x;
                 int bottom = top+world.subchunk_size.y;
                 //printf("...ees");
 
                 FullWorldIndex wi_bottom_left_sc = GeneralAccessXY(world, right, bottom);
-                if (world.chunks[wi_bottom_left_sc.chunk_pos.y*world.chunk_count.x+world.beany_chunks[i].chunk_pos.x]==NULL)
+                if (world.chunks[wi_bottom_left_sc.chunk_pos.y*world.chunk_count.x+world.active_chunks2[i].chunk_pos.x]==NULL)
                 {
-                    world.chunks[wi_bottom_left_sc.chunk_pos.y*world.chunk_count.x+world.beany_chunks[i].chunk_pos.x]=GenerateEmptyChunk(world.chunk_size,world.subchunk_size);
+                    world.chunks[wi_bottom_left_sc.chunk_pos.y*world.chunk_count.x+world.active_chunks2[i].chunk_pos.x]=GenerateEmptyChunk(world.chunk_size,world.subchunk_size);
                 }
+                
 
                 //for(int y = bottom-1; y>=world.outer_subchunks_topleft[j].y; y--)
                 //printf("...");
@@ -420,6 +439,10 @@ void SimulateWorld(Map world)
                         FullWorldIndex wi_right = GeneralAccessXY(world, x+1, y);
                         FullWorldIndex wi_left = GeneralAccessXY(world, x-1, y);
 
+
+                        if (world.chunks[wi_under.chunk] &&  world.chunks[wi_under_left.chunk] && world.chunks[wi_left.chunk] && world.chunks[wi_right.chunk], world.chunks[wi_under_right.chunk])
+                            break;
+ 
                         //printf("%i, %i", wi.chunk, wi.in_chunk);
                         if (world.chunks[wi.chunk]->tiles[wi.in_chunk]==FLUID)
                         {
@@ -432,6 +455,7 @@ void SimulateWorld(Map world)
                                 world.chunks[wi.chunk]->tiles[wi.in_chunk] = VOID;
                                 world.chunks[wi.chunk]->colors[wi.in_chunk] = BLANK;
                                 world.chunks[wi.chunk]->moved[wi.in_chunk] = 0;
+                                ActivateChunk(world, wi_under);
 
 
 
@@ -446,6 +470,8 @@ void SimulateWorld(Map world)
                                 world.chunks[wi.chunk]->tiles[wi.in_chunk] = VOID;
                                 world.chunks[wi.chunk]->colors[wi.in_chunk] = BLANK;
                                 world.chunks[wi.chunk]->moved[wi.in_chunk] = 0;
+                                ActivateChunk(world, wi_under_right);
+
 
 
                             }                            
@@ -460,18 +486,22 @@ void SimulateWorld(Map world)
                                 world.chunks[wi.chunk]->tiles[wi.in_chunk] = VOID;
                                 world.chunks[wi.chunk]->colors[wi.in_chunk] = BLANK;
                                 world.chunks[wi.chunk]->moved[wi.in_chunk] = 0;
+                                ActivateChunk(world, wi_under_left);
 
                             }
 
-                            else if (world.chunks[wi_right.chunk]->tiles[wi_right.in_chunk+1]<2)
+                            else if (world.chunks[wi_right.chunk]->tiles[wi_right.in_chunk]<2)
                             {
                                 world.chunks[wi_right.chunk]->tiles[wi_right.in_chunk] = FLUID;
                                 world.chunks[wi_right.chunk]->colors[wi_right.in_chunk] = world.chunks[wi.chunk]->colors[wi.in_chunk];
                                 world.chunks[wi_right.chunk]->moved[wi_right.in_chunk] = 1;
 
+
                                 world.chunks[wi.chunk]->tiles[wi.in_chunk] = VOID;
                                 world.chunks[wi.chunk]->colors[wi.in_chunk] = BLANK;
                                 world.chunks[wi.chunk]->moved[wi.in_chunk] = 0;
+                                ActivateChunk(world, wi_right);
+
                             }
 
                             else if (world.chunks[wi_left.chunk]->tiles[wi_left.in_chunk]<2)
@@ -483,6 +513,8 @@ void SimulateWorld(Map world)
                                 world.chunks[wi.chunk]->tiles[wi.in_chunk] = VOID;
                                 world.chunks[wi.chunk]->colors[wi.in_chunk] = BLANK;
                                 world.chunks[wi.chunk]->moved[wi.in_chunk] = 0;
+                                ActivateChunk(world, wi_left);
+
                             }
 
                            
@@ -499,6 +531,84 @@ void SimulateWorld(Map world)
     }
 }
 
+// Size should be larger than 0 (in both axes), anything else is undefined behaviour
+void DrawWorldDebug(Map world, Vector2i offset, Vector2i size, RenderTexture2D target)
+{
+    int offset_from_left_chunk_border = offset.x % world.chunk_size.x;
+    int left_chunk = offset.x / world.chunk_size.x;
+
+
+    int width_from_left_chunk_border =  offset_from_left_chunk_border + size.x;
+    int chunk_width = width_from_left_chunk_border/world.chunk_size.x;
+
+    int offset_from_top_chunk_border = offset.y % world.chunk_size.y;
+    int top_chunk = offset.y / world.chunk_size.y;
+
+
+    int height_from_top_chunk_border = offset_from_top_chunk_border + size.y;
+    int chunk_height = height_from_top_chunk_border/world.chunk_size.y;
+
+    int row_offset;
+
+    Vect2i origin_in_chunk;
+    Vect2i end_in_chunk;
+
+    Vect2i offset_c = (Vect2i){.x=0, .y=0}; // Screen offset
+
+    // I could implement this all in different for loops for a slight performance gain but I don't wanna debug that all
+    for(int y = 0; y<=chunk_height; y++)
+    {
+        origin_in_chunk.y = 0;
+        end_in_chunk.y = world.chunk_size.y; 
+
+
+        if (y==0)
+        {
+            origin_in_chunk.y = offset_from_top_chunk_border;
+        }
+        if (y==chunk_height)
+        {
+            end_in_chunk.y = (offset.y+size.y)%world.chunk_size.y;
+        }
+      
+
+        row_offset = (top_chunk+y)*world.chunk_count.x;
+        offset_c.x = 0;
+        for(int x = 0; x<=chunk_width; x++)
+        {
+            origin_in_chunk.x = 0;
+            end_in_chunk.x = world.chunk_size.x; 
+
+
+
+            if (x==0)
+            {
+                origin_in_chunk.x = offset_from_left_chunk_border;
+
+
+            }
+            if (x==chunk_width)
+            {
+                end_in_chunk.x = (offset.x+size.x)%world.chunk_size.x;
+            }
+            
+            if (world.chunks[row_offset+left_chunk+x] == NULL)
+            { 
+                world.chunks[row_offset+left_chunk+x]= GenerateEmptyChunk(world.chunk_size, world.subchunk_size);
+            }
+
+            
+            DrawPartOfChunk(world.chunks[row_offset+left_chunk+x], 
+
+            origin_in_chunk, end_in_chunk, 
+            offset_c, world.chunk_size, target);
+
+            offset_c.x += end_in_chunk.x - origin_in_chunk.x;
+        }
+        offset_c.y += end_in_chunk.y - origin_in_chunk.y;
+
+    }
+}
 
 // Size should be larger than 0 (in both axes), anything else is undefined behaviour
 void DrawWorld(Map world, Vector2i offset, Vector2i size, RenderTexture2D target)

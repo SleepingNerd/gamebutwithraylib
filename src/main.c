@@ -88,11 +88,12 @@ int main()
     BeginTextureMode(static_world);
     ClearBackground(WHITE);
     //RenderWorld(world, world.)
+
     EndTextureMode();
     Image img_slice;
 
-    Map world = GenerateEmptyWorld((Vector2i){.x = 512, .y = 512}, (Vector2i){.x = 4096, .y =4096}, (Vector2i){.x = 8, .y = 8}); // 64 by 64 subchunks
-    if (world.beany_chunks == NULL)
+    Map world = GenerateEmptyWorld((Vector2i){.x = 64, .y = 64}, (Vector2i){.x = 4096, .y =4096}, (Vector2i){.x =4 , .y=4}); // 64 by 64 subchunks
+    if (world.active_chunks == NULL)
     {
             printf("\nWhyyy\n");
     }
@@ -112,8 +113,11 @@ int main()
         if (tick_counter > tick_speed)
         {
             tick_counter = 0;
-
+            
+            // Begin simulating
+            SwapACBuffers(world);
             SimulateWorld(world);
+
             /*
             if (tick_tracker%horizontal_ticks)
             {
@@ -225,7 +229,7 @@ int main()
             
             
             DrawTexturePro(screen.texture, (Rectangle){.x=0, .y=0, .width=screenWidth, .height=-screenHeight}, (Rectangle){.x=0, .y=0, .width=winWidth, .height=winHeight}, (Vector2){.x = 0, .y = 0}, 0.0f, WHITE);
-            for (int i = 0; i<3; i++)
+            for (int i = 0; i<6; i++)
             {
                 
                 int y = (-(camera.p_offset.y%world.chunk_size.y)+i*world.chunk_size.y);
@@ -234,7 +238,8 @@ int main()
                 DrawLine(0,y,winWidth,y ,BLACK);
 
             }
-              for (int i = 0; i<3; i++)
+
+              for (int i = 0; i<6; i++)
             {
                 
                 int x = (-(camera.p_offset.x%world.chunk_size.x)+i*world.chunk_size.x);

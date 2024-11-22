@@ -5,7 +5,11 @@
 #ifndef WORLD_H
 #define WORLD_H
 
+#define USE_STATIC_RECTS
+//#define USE_DYNAMIC_RECTS
 
+
+#define DEFAULT_ACTIVE_LEN 20
 
 #define TILE_SIZE 1
 #define TILES 1
@@ -41,6 +45,10 @@ typedef struct Chunk{
     Color *colors;
     char *moved;
     char *subchunks; // keeps track of which subchunks are active
+    char is_active;
+    
+
+    
 } Chunk;
 
 
@@ -87,7 +95,12 @@ typedef struct Map{
 
 
     Chunk **chunks;
-    FullWorldIndex *beany_chunks;
+
+    
+    
+    FullWorldIndex *active_chunks2; // active_chunks should be dubble buffered
+    FullWorldIndex *active_chunks;
+    int active_chunks_len;
 } Map; 
 
 // Should be noted that the top left of the world corresponds to arr[0][0]
@@ -115,6 +128,7 @@ void RenderWorld(World world, Vector2i world_size);
 // Allocates and creates an empty world
 void EmptyWorld(World *world, Vector2i size);
 void ChangeTile(Map world, Vector2i position, TileState tile_state, Color color);
+
 TileState GetTileState(Map world, int x, int y);
 FullWorldIndex GeneralAccessXY(Map world, int x, int y);
 
@@ -131,10 +145,12 @@ void SimulateWorld(Map world);
 void SimulateWorldVariant(Map world);
 void SimulateWorldVariantThree(Map world);
 void SimulateWorldVariantFour(Map world);
+void SwapACBuffers(Map w);
 
 
 
-void AddActiveChunk(Map w, FullWorldIndex chunk_i);
+
+void ActivateChunk(Map w, FullWorldIndex chunk_i);
 // io
 void SaveWorld(World world, char *path);
 
